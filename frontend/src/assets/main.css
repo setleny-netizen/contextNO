@@ -1,0 +1,16 @@
+@font-face {
+  font-family: BalkaraFree;
+  src: url("Nunito-Regular.ttf");
+}
+
+html * {
+  font-family: BalkaraFree !important;
+  font-size: 18px;
+  font-weight: 700;
+}
+
+:root {
+  --green: #b5e2dc;
+  --yellow: #f4da92;
+  --red: #f7c0b5;
+}
