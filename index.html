@@ -8,7 +8,7 @@
 </head>
 <body>
 
-  <!-- ВЕРХ: счёт по центру -->
+  <!-- ВЕРХ: счёт -->
   <header class="topbar">
     <div class="balance-block">
       <div class="balance-label">Ваш счёт</div>
@@ -42,7 +42,7 @@
     </div>
   </header>
 
-  <!-- ЦЕНТР: айсберг + подсказка -->
+  <!-- ЦЕНТР: айсберг -->
   <main class="stage">
     <div class="iceberg-wrap" id="icebergWrap">
       <svg class="iceberg-svg" id="icebergSvg" viewBox="0 0 400 420"
@@ -173,7 +173,6 @@
   <!-- МОДАЛКА: УЛУЧШЕНИЯ -->
   <div class="modal" id="upgradesModal" aria-hidden="true">
     <div class="modal__backdrop" data-close></div>
-
     <div class="modal__sheet" role="dialog" aria-label="Улучшения">
       <div class="modal__header">
         <h2 class="modal__title">Улучшения</h2>
@@ -185,7 +184,6 @@
         </button>
       </div>
 
-      <!-- Табы -->
       <div class="tabs" role="tablist">
         <button class="tab tab--active" data-tab-target="click" type="button" role="tab">
           За клик
@@ -195,8 +193,46 @@
         </button>
       </div>
 
-      <!-- Список улучшений -->
       <div class="upgrades-list" id="upgradesList"></div>
+    </div>
+  </div>
+
+  <!-- МОДАЛКА: ПРОФИЛЬ -->
+  <div class="modal" id="profileModal" aria-hidden="true">
+    <div class="modal__backdrop" data-close></div>
+    <div class="modal__sheet" role="dialog" aria-label="Профиль">
+      <div class="modal__header">
+        <h2 class="modal__title">Профиль</h2>
+        <button class="modal__close" type="button" data-close aria-label="Закрыть">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"
+               stroke-width="2" stroke-linecap="round" aria-hidden="true">
+            <path d="M6 6L18 18M18 6L6 18"/>
+          </svg>
+        </button>
+      </div>
+
+      <div class="profile-stats">
+        <div class="stat-card">
+          <div class="stat-card__label">Всего добыто льда</div>
+          <div class="stat-card__value" id="statTotalEarned">0</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-card__label">Ударов по айсбергу</div>
+          <div class="stat-card__value" id="statClicks">0</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-card__label">Текущий баланс</div>
+          <div class="stat-card__value" id="statBalance">0</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-card__label">Доход в секунду</div>
+          <div class="stat-card__value" id="statRate">0</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-card__label">Добыча за клик</div>
+          <div class="stat-card__value" id="statClickBonus">1</div>
+        </div>
+      </div>
     </div>
   </div>
 
