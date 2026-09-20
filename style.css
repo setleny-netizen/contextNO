@@ -1,239 +1,458 @@
-// ============================================================
-// ЛОХМАТЫЙ КЛУБ — игровая логика (прототип, без бэкенда)
-// ============================================================
+/* ============================================================
+   ЛОХМАТЫЙ КЛУБ
+   ============================================================ */
 
-// ---------- Состояние ----------
-const state = {
-  balance: 0,
-  clickLevels: {},   // { upgradeId: level }
-  passiveLevels: {}, // { upgradeId: level }
-};
+* { box-sizing: border-box; margin: 0; padding: 0; }
 
-// ---------- Справочники улучшений ----------
-const CLICK_UPGRADES = [
-  { id: 'pick',    name: 'Крепкая кирка', bonus: 1,   basePrice: 50 },
-  { id: 'iceaxe',  name: 'Ледоруб',        bonus: 5,   basePrice: 500 },
-  { id: 'crew',    name: 'Бригада',        bonus: 15,  basePrice: 5000 },
-  { id: 'drill',   name: 'Бур',            bonus: 50,  basePrice: 50000 },
-  { id: 'breaker', name: 'Ледокол',        bonus: 200, basePrice: 500000 },
-];
-
-const PASSIVE_UPGRADES = [
-  { id: 'fridge',   name: 'Холодильник',   bonus: 1,   basePrice: 100 },
-  { id: 'freezer',  name: 'Морозилка',     bonus: 5,   basePrice: 1000 },
-  { id: 'glacier',  name: 'Ледник',        bonus: 25,  basePrice: 10000 },
-  { id: 'farm',     name: 'Айсберг-ферма', bonus: 100, basePrice: 100000 },
-  { id: 'permafrost', name: 'Вечная мерзлота', bonus: 500, basePrice: 1000000 },
-];
-
-// ---------- DOM ----------
-const balanceEl     = document.getElementById('balance');
-const balanceRateEl = document.getElementById('balanceRate');
-const wrap          = document.getElementById('icebergWrap');
-const svg           = document.getElementById('icebergSvg');
-const layer         = document.getElementById('cubesLayer');
-const modal         = document.getElementById('upgradesModal');
-const upgradesList  = document.getElementById('upgradesList');
-const navButtons    = document.querySelectorAll('.nav-btn');
-const tabs          = document.querySelectorAll('.tab');
-
-let activeUpgradeTab = 'click';
-
-// ---------- Форматирование ----------
-function formatNumber(n) {
-  return Math.floor(n).toLocaleString('ru-RU');
+:root {
+  --bg:         #0A0A0A;
+  --card:       #141414;
+  --card-2:     #1A1A1A;
+  --border:     #1F1F1F;
+  --gold:       #C9A227;
+  --gold-2:     #D4AF37;
+  --cream:      #F2EFE6;
+  --muted:      #6E6E6E;
+  --green:      #4ADE80;
+  --nav-height: 72px;
 }
 
-// ---------- Расчёт бонусов ----------
-function getClickBonus() {
-  return 1 + CLICK_UPGRADES.reduce((sum, u) => {
-    const lvl = state.clickLevels[u.id] || 0;
-    return sum + u.bonus * lvl;
-  }, 0);
+html, body {
+  height: 100%;
+  background: var(--bg);
+  color: var(--cream);
+  font-family: 'Manrope', system-ui, -apple-system, sans-serif;
+  overflow: hidden;
+  -webkit-tap-highlight-color: transparent;
+  user-select: none;
 }
 
-function getPassiveBonus() {
-  return PASSIVE_UPGRADES.reduce((sum, u) => {
-    const lvl = state.passiveLevels[u.id] || 0;
-    return sum + u.bonus * lvl;
-  }, 0);
+/* ================= ВЕРХ ================= */
+.topbar {
+  position: relative;
+  z-index: 2;
+  padding: calc(env(safe-area-inset-top, 0px) + 24px) 16px 8px;
+  text-align: center;
 }
 
-function getUpgradePrice(upgrade, level) {
-  // Цена растёт ×1.15 за каждый уровень
-  return Math.floor(upgrade.basePrice * Math.pow(1.15, level));
+.balance-block { display: inline-block; }
+
+.balance-label {
+  font-size: 13px;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--gold-2);
+  opacity: 0.85;
+  margin-bottom: 6px;
+  text-align: center;
 }
 
-// ---------- Обновление UI ----------
-function updateBalanceUI() {
-  balanceEl.textContent = formatNumber(state.balance);
-  balanceRateEl.textContent = `+${formatNumber(getPassiveBonus())} / сек`;
+.balance-row {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
 }
 
-// ---------- Клик по айсбергу ----------
-let lastClick = 0;
-const CLICK_COOLDOWN = 60;
-
-svg.addEventListener('pointerdown', (e) => {
-  const now = performance.now();
-  if (now - lastClick < CLICK_COOLDOWN) return;
-  lastClick = now;
-
-  wrap.classList.remove('hit');
-  void wrap.offsetWidth;
-  wrap.classList.add('hit');
-
-  spawnCrack(e.clientX, e.clientY);
-  spawnCube(e.clientX, e.clientY, getClickBonus());
-});
-
-function spawnCrack(x, y) {
-  const crack = document.createElement('div');
-  crack.className = 'crack';
-  crack.style.left = x + 'px';
-  crack.style.top  = y + 'px';
-  document.body.appendChild(crack);
-  setTimeout(() => crack.remove(), 400);
+.balance-value {
+  font-size: 40px;
+  font-weight: 800;
+  color: var(--cream);
+  letter-spacing: -0.02em;
+  line-height: 1;
 }
 
-function spawnCube(startX, startY, reward) {
-  const cube = document.createElement('div');
-  cube.className = 'cube';
-  cube.style.left = startX + 'px';
-  cube.style.top  = startY + 'px';
-
-  const target  = balanceEl.getBoundingClientRect();
-  const targetX = target.left + target.width  / 2;
-  const targetY = target.top  + target.height / 2;
-
-  const dx = targetX - startX;
-  const dy = targetY - startY;
-  const jitter = (Math.random() - 0.5) * 60;
-
-  cube.style.setProperty('--dx', dx + 'px');
-  cube.style.setProperty('--dy', dy + 'px');
-  cube.style.setProperty('--jx', jitter + 'px');
-
-  layer.appendChild(cube);
-
-  cube.addEventListener('animationend', () => {
-    state.balance += reward;
-    updateBalanceUI();
-    balanceEl.classList.remove('pulse');
-    void balanceEl.offsetWidth;
-    balanceEl.classList.add('pulse');
-    cube.remove();
-  });
+.balance-value.pulse {
+  animation: pulse 0.3s ease;
+}
+@keyframes pulse {
+  0%   { transform: scale(1);    color: var(--cream); }
+  50%  { transform: scale(1.12); color: var(--gold-2); }
+  100% { transform: scale(1);    color: var(--cream); }
 }
 
-// ---------- Пассивная добыча ----------
-setInterval(() => {
-  const income = getPassiveBonus();
-  if (income > 0) {
-    state.balance += income;
-    updateBalanceUI();
+.balance-icon {
+  display: inline-block;
+  width: 32px;
+  height: 32px;
+  flex-shrink: 0;
+  filter: drop-shadow(0 0 8px rgba(191,227,245,0.55));
+}
+.balance-icon svg { width: 100%; height: 100%; display: block; }
+
+.balance-rate {
+  font-size: 13px;
+  color: var(--green);
+  margin-top: 4px;
+  letter-spacing: 0.02em;
+}
+
+/* ================= ЦЕНТР ================= */
+.stage {
+  position: relative;
+  z-index: 1;
+  height: calc(100vh - 240px - var(--nav-height));
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 14px;
+}
+
+.iceberg-wrap {
+  position: relative;
+  width: 240px;
+  height: 260px;
+  transition: transform 0.08s ease;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.iceberg-svg {
+  width: 100%;
+  height: 100%;
+  display: block;
+  pointer-events: auto;
+  cursor: pointer;
+}
+
+.iceberg-wrap.hit {
+  animation: hit 0.12s ease;
+}
+@keyframes hit {
+  0%   { transform: translateY(0); }
+  50%  { transform: translateY(4px) scale(0.99); }
+  100% { transform: translateY(0); }
+}
+
+/* ================= Трещина ================= */
+.crack {
+  position: fixed;
+  width: 24px; height: 24px;
+  pointer-events: none;
+  transform: translate(-50%, -50%);
+  z-index: 3;
+}
+.crack::before,
+.crack::after {
+  content: '';
+  position: absolute;
+  left: 50%; top: 50%;
+  width: 2px; height: 14px;
+  background: rgba(255,255,255,0.95);
+  border-radius: 2px;
+  transform-origin: center;
+  animation: crackFade 0.4s ease forwards;
+}
+.crack::before { transform: translate(-50%,-50%) rotate(25deg); }
+.crack::after  { transform: translate(-50%,-50%) rotate(-40deg); }
+
+@keyframes crackFade {
+  0%   { opacity: 1; }
+  100% { opacity: 0; transform: translate(-50%,-50%) scale(1.4); }
+}
+
+/* ================= Летящий кубик ================= */
+.cubes-layer {
+  position: fixed; inset: 0;
+  pointer-events: none;
+  z-index: 4;
+}
+
+.cube {
+  position: fixed;
+  width: 22px; height: 22px;
+  border-radius: 4px;
+  background: linear-gradient(135deg, #EAF6FF 0%, #BFE3F5 40%, #7FB8D9 100%);
+  box-shadow:
+    inset 2px 2px 4px rgba(255,255,255,0.9),
+    inset -2px -2px 6px rgba(27,42,65,0.4),
+    0 0 10px rgba(191,227,245,0.7);
+  transform: translate(-50%, -50%);
+  animation: flyToBalance 0.7s cubic-bezier(0.5, -0.3, 0.7, 1.2) forwards;
+}
+
+@keyframes flyToBalance {
+  0% {
+    transform: translate(-50%, -50%) scale(1) rotate(0deg);
+    opacity: 1;
   }
-}, 1000);
-
-// ---------- Модалка ----------
-function openModal() {
-  modal.classList.add('open');
-  modal.setAttribute('aria-hidden', 'false');
-  renderUpgrades();
-}
-function closeModal() {
-  modal.classList.remove('open');
-  modal.setAttribute('aria-hidden', 'true');
-}
-
-modal.addEventListener('click', (e) => {
-  if (e.target.closest('[data-close]')) closeModal();
-});
-
-// ---------- Табы ----------
-tabs.forEach((tab) => {
-  tab.addEventListener('click', () => {
-    tabs.forEach((t) => t.classList.remove('tab--active'));
-    tab.classList.add('tab--active');
-    activeUpgradeTab = tab.dataset.tabTarget;
-    renderUpgrades();
-  });
-});
-
-// ---------- Рендер списка улучшений ----------
-function renderUpgrades() {
-  const list = activeUpgradeTab === 'click' ? CLICK_UPGRADES : PASSIVE_UPGRADES;
-  const levels = activeUpgradeTab === 'click' ? state.clickLevels : state.passiveLevels;
-  const suffix = activeUpgradeTab === 'click' ? 'к клику' : 'в секунду';
-
-  upgradesList.innerHTML = '';
-
-  list.forEach((upgrade) => {
-    const level = levels[upgrade.id] || 0;
-    const price = getUpgradePrice(upgrade, level);
-    const canBuy = state.balance >= price;
-
-    const card = document.createElement('div');
-    card.className = 'upgrade-card';
-    card.innerHTML = `
-      <div class="upgrade-card__icon">+${upgrade.bonus}</div>
-      <div class="upgrade-card__info">
-        <div class="upgrade-card__name">${upgrade.name}</div>
-        <div class="upgrade-card__desc">+${upgrade.bonus} ${suffix}</div>
-        <div class="upgrade-card__level">Уровень: ${level}</div>
-      </div>
-      <div class="upgrade-card__action">
-        <button class="buy-btn" type="button" data-buy="${upgrade.id}" ${canBuy ? '' : 'disabled'}>
-          Купить
-          <span class="buy-btn__price">${formatNumber(price)}</span>
-        </button>
-      </div>
-    `;
-
-    upgradesList.appendChild(card);
-  });
+  40% {
+    transform:
+      translate(calc(-50% + var(--dx) * 0.4 + var(--jx)),
+                calc(-50% + var(--dy) * 0.4 - 40px))
+      scale(1.1) rotate(120deg);
+    opacity: 1;
+  }
+  100% {
+    transform:
+      translate(calc(-50% + var(--dx)),
+                calc(-50% + var(--dy)))
+      scale(0.3) rotate(360deg);
+    opacity: 0;
+  }
 }
 
-// ---------- Покупка ----------
-upgradesList.addEventListener('click', (e) => {
-  const btn = e.target.closest('[data-buy]');
-  if (!btn || btn.disabled) return;
+/* ================= ПОДСКАЗКА ================= */
+.hintbar {
+  text-align: center;
+  pointer-events: none;
+}
 
-  const id = btn.dataset.buy;
-  const list = activeUpgradeTab === 'click' ? CLICK_UPGRADES : PASSIVE_UPGRADES;
-  const levels = activeUpgradeTab === 'click' ? state.clickLevels : state.passiveLevels;
-  const upgrade = list.find((u) => u.id === id);
-  if (!upgrade) return;
+.hint-text {
+  font-size: 13px;
+  color: var(--muted);
+  letter-spacing: 0.02em;
+}
 
-  const level = levels[id] || 0;
-  const price = getUpgradePrice(upgrade, level);
+/* ================= НИЖНЕЕ МЕНЮ ================= */
+.bottomnav {
+  position: fixed;
+  left: 0; right: 0; bottom: 0;
+  height: calc(var(--nav-height) + env(safe-area-inset-bottom, 0px));
+  padding: 8px 8px calc(env(safe-area-inset-bottom, 0px) + 8px);
+  background: var(--card);
+  border-top: 1px solid var(--border);
+  display: flex;
+  align-items: stretch;
+  justify-content: space-around;
+  z-index: 10;
+}
 
-  if (state.balance < price) return;
+.nav-btn {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+  background: transparent;
+  border: none;
+  color: var(--muted);
+  font-family: inherit;
+  font-size: 11px;
+  letter-spacing: 0.02em;
+  cursor: pointer;
+  padding: 6px 4px;
+  border-radius: 12px;
+  transition: color 0.15s ease, background 0.15s ease;
+  -webkit-tap-highlight-color: transparent;
+}
 
-  state.balance -= price;
-  levels[id] = level + 1;
+.nav-btn:hover { color: var(--cream); }
+.nav-btn.active { color: var(--gold-2); }
 
-  updateBalanceUI();
-  renderUpgrades();
-});
+.nav-btn.active .nav-icon {
+  filter: drop-shadow(0 0 8px rgba(212,175,55,0.45));
+}
 
-// ---------- Нижнее меню ----------
-navButtons.forEach((navBtn) => {
-  navBtn.addEventListener('click', () => {
-    navButtons.forEach((b) => b.classList.remove('active'));
-    navBtn.classList.add('active');
+.nav-icon {
+  width: 26px;
+  height: 26px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: filter 0.15s ease;
+}
+.nav-icon svg { width: 100%; height: 100%; }
 
-    const tab = navBtn.dataset.tab;
-    if (tab === 'upgrades') {
-      openModal();
-    } else {
-      console.log('Открыть вкладку:', tab);
-    }
-  });
-});
+.nav-label {
+  font-size: 11px;
+  line-height: 1;
+}
 
-// По умолчанию — активна «Улучшения» (но модалку не открываем сразу)
-document.querySelector('.nav-btn[data-tab="upgrades"]')?.classList.add('active');
+/* ================= МОДАЛКА ================= */
+.modal {
+  position: fixed;
+  inset: 0;
+  z-index: 100;
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.2s ease;
+}
+.modal.open {
+  opacity: 1;
+  pointer-events: auto;
+}
 
-// ---------- Инициализация ----------
-updateBalanceUI();
+.modal__backdrop {
+  position: absolute;
+  inset: 0;
+  background: rgba(0,0,0,0.6);
+  backdrop-filter: blur(2px);
+}
+
+.modal__sheet {
+  position: relative;
+  width: 100%;
+  max-width: 480px;
+  max-height: 85vh;
+  background: var(--card);
+  border-top-left-radius: 20px;
+  border-top-right-radius: 20px;
+  border-top: 1px solid var(--border);
+  padding: 20px 16px calc(env(safe-area-inset-bottom, 0px) + 20px);
+  display: flex;
+  flex-direction: column;
+  transform: translateY(100%);
+  transition: transform 0.3s cubic-bezier(0.2, 0.8, 0.2, 1);
+}
+.modal.open .modal__sheet {
+  transform: translateY(0);
+}
+
+.modal__header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 16px;
+}
+
+.modal__title {
+  font-size: 20px;
+  font-weight: 700;
+  color: var(--cream);
+  letter-spacing: 0.02em;
+}
+
+.modal__close {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  background: transparent;
+  border: 1px solid var(--border);
+  color: var(--muted);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: color 0.15s ease, border-color 0.15s ease;
+}
+.modal__close:hover { color: var(--cream); border-color: var(--gold-2); }
+.modal__close svg { width: 16px; height: 16px; }
+
+/* Табы */
+.tabs {
+  display: flex;
+  background: var(--card-2);
+  border-radius: 12px;
+  padding: 4px;
+  margin-bottom: 14px;
+}
+
+.tab {
+  flex: 1;
+  padding: 8px 12px;
+  background: transparent;
+  border: none;
+  color: var(--muted);
+  font-family: inherit;
+  font-size: 13px;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: background 0.15s ease, color 0.15s ease;
+}
+.tab--active {
+  background: var(--card);
+  color: var(--gold-2);
+  box-shadow: 0 0 0 1px var(--border);
+}
+
+/* Список улучшений */
+.upgrades-list {
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  padding-right: 4px;
+  -webkit-overflow-scrolling: touch;
+}
+
+.upgrade-card {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  background: var(--card-2);
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  padding: 12px;
+}
+
+.upgrade-card__icon {
+  width: 44px;
+  height: 44px;
+  flex-shrink: 0;
+  border-radius: 10px;
+  background: linear-gradient(135deg, #EAF6FF 0%, #BFE3F5 50%, #7FB8D9 100%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #1B2A41;
+  font-weight: 800;
+  font-size: 14px;
+}
+
+.upgrade-card__info {
+  flex: 1;
+  min-width: 0;
+}
+
+.upgrade-card__name {
+  font-size: 14px;
+  font-weight: 700;
+  color: var(--cream);
+  margin-bottom: 2px;
+}
+
+.upgrade-card__desc {
+  font-size: 12px;
+  color: var(--muted);
+  margin-bottom: 2px;
+}
+
+.upgrade-card__level {
+  font-size: 11px;
+  color: var(--gold-2);
+  opacity: 0.85;
+}
+
+.upgrade-card__action {
+  flex-shrink: 0;
+}
+
+.buy-btn {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 2px;
+  padding: 8px 12px;
+  background: var(--gold);
+  color: #0A0A0A;
+  border: none;
+  border-radius: 10px;
+  font-family: inherit;
+  font-size: 12px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: background 0.15s ease, opacity 0.15s ease;
+  min-width: 84px;
+}
+.buy-btn:hover:not(:disabled) { background: var(--gold-2); }
+.buy-btn:disabled {
+  background: var(--card);
+  color: var(--muted);
+  cursor: not-allowed;
+  border: 1px solid var(--border);
+}
+
+.buy-btn__price {
+  font-size: 11px;
+  opacity: 0.9;
+  font-weight: 600;
+}
