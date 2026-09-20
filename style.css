@@ -1,11 +1,5 @@
 /* ============================================================
    ЛОХМАТЫЙ КЛУБ — стили
-   Палитра:
-   #0A0A0A — фон
-   #1C1C1C — карточки
-   #C9A227 / #D4AF37 — золото
-   #F2EFE6 — текст/мех
-   #1B2A41 / #243B55 — тёмно-синий
    ============================================================ */
 
 * { box-sizing: border-box; margin: 0; padding: 0; }
@@ -30,7 +24,7 @@ html, body {
   user-select: none;
 }
 
-/* ================= ВЕРХ: счётчик ================= */
+/* ================= ВЕРХ ================= */
 .topbar {
   position: relative;
   z-index: 2;
@@ -53,9 +47,7 @@ html, body {
   gap: 14px;
 }
 
-.balance-info {
-  text-align: left;
-}
+.balance-info { text-align: left; }
 
 .balance-label {
   font-family: 'Playfair Display', Georgia, serif;
@@ -70,7 +62,6 @@ html, body {
   font-size: 28px;
   font-weight: 700;
   color: var(--cream);
-  transition: transform 0.15s ease;
 }
 
 .balance-value.pulse {
@@ -82,20 +73,15 @@ html, body {
   100% { transform: scale(1);    color: var(--cream); }
 }
 
-/* Иконка кубика льда справа от баланса */
 .balance-icon {
   width: 40px;
   height: 40px;
   flex-shrink: 0;
   filter: drop-shadow(0 0 8px rgba(191,227,245,0.55));
 }
-.balance-icon svg {
-  width: 100%;
-  height: 100%;
-  display: block;
-}
+.balance-icon svg { width: 100%; height: 100%; display: block; }
 
-/* ================= ЦЕНТР: сцена с айсбергом ================= */
+/* ================= ЦЕНТР: айсберг ================= */
 .stage {
   position: relative;
   z-index: 1;
@@ -105,29 +91,28 @@ html, body {
   justify-content: center;
 }
 
-.iceberg-wrap {
-  position: relative;
-  width: 280px;
-  height: 300px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
+/* Кнопка-обёртка: сбрасываем стили кнопки браузера */
+.iceberg-btn {
+  all: unset;
+  display: block;
+  width: 320px;
+  height: 340px;
+  cursor: pointer;
   transition: transform 0.08s ease;
+  -webkit-tap-highlight-color: transparent;
 }
 
 .iceberg-svg {
   width: 100%;
   height: 100%;
   display: block;
-  pointer-events: auto;   /* клики ловит сам SVG, только по залитым фигурам */
-  cursor: pointer;
   filter:
     drop-shadow(0 12px 24px rgba(27,42,65,0.55))
     drop-shadow(0 0 18px rgba(127,184,217,0.25));
 }
 
-/* Вздрагивание при клике */
-.iceberg-wrap.hit {
+/* Вздрагивание */
+.iceberg-btn.hit {
   animation: hit 0.12s ease;
 }
 @keyframes hit {
@@ -136,7 +121,7 @@ html, body {
   100% { transform: translateY(0); }
 }
 
-/* ================= Трещина в точке клика ================= */
+/* ================= Трещина ================= */
 .crack {
   position: fixed;
   width: 24px; height: 24px;
@@ -204,7 +189,7 @@ html, body {
   }
 }
 
-/* ================= НИЗ: под будущие кнопки ================= */
+/* ================= НИЗ ================= */
 .bottombar {
   position: fixed;
   left: 0; right: 0; bottom: 0;
