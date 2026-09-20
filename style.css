@@ -334,7 +334,7 @@ html, body {
 .modal__close:hover { color: var(--cream); border-color: var(--gold-2); }
 .modal__close svg { width: 16px; height: 16px; }
 
-/* Табы */
+/* ================= ТАБЫ ================= */
 .tabs {
   display: flex;
   background: var(--card-2);
@@ -363,7 +363,7 @@ html, body {
   box-shadow: 0 0 0 1px var(--border);
 }
 
-/* Список улучшений */
+/* ================= УЛУЧШЕНИЯ ================= */
 .upgrades-list {
   overflow-y: auto;
   display: flex;
@@ -457,8 +457,7 @@ html, body {
   font-weight: 600;
 }
 
-
-/* ================= ПРОФИЛЬ: статистика ================= */
+/* ================= ПРОФИЛЬ ================= */
 .profile-stats {
   display: flex;
   flex-direction: column;
@@ -489,4 +488,75 @@ html, body {
   font-weight: 700;
   color: var(--cream);
   letter-spacing: -0.01em;
+}
+
+/* ================= СБРОС ПРОГРЕССА ================= */
+.reset-block {
+  margin-top: 6px;
+}
+
+.reset-btn {
+  width: 100%;
+  padding: 14px 16px;
+  background: transparent;
+  border: 1px solid #7F1D1D;
+  color: #F87171;
+  border-radius: 14px;
+  font-family: inherit;
+  font-size: 14px;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+  cursor: pointer;
+  transition: background 0.15s ease, color 0.15s ease, border-color 0.15s ease;
+  -webkit-tap-highlight-color: transparent;
+}
+.reset-btn:hover {
+  background: rgba(127, 29, 29, 0.15);
+  border-color: #B91C1C;
+  color: #FCA5A5;
+}
+
+.reset-confirm {
+  background: rgba(127, 29, 29, 0.12);
+  border: 1px solid #7F1D1D;
+  border-radius: 14px;
+  padding: 14px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.reset-confirm__text {
+  font-size: 13px;
+  color: #FCA5A5;
+  text-align: center;
+  line-height: 1.4;
+}
+
+.reset-confirm__actions {
+  display: flex;
+  gap: 10px;
+}
+
+.reset-btn--danger {
+  flex: 1;
+  background: #B91C1C;
+  color: #FFFFFF;
+  border-color: #B91C1C;
+}
+.reset-btn--danger:hover {
+  background: #DC2626;
+  border-color: #DC2626;
+  color: #FFFFFF;
+}
+
+.reset-btn--ghost {
+  flex: 1;
+  border-color: var(--border);
+  color: var(--muted);
+}
+.reset-btn--ghost:hover {
+  border-color: var(--gold-2);
+  color: var(--cream);
+  background: transparent;
 }
