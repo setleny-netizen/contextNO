@@ -8,37 +8,39 @@
 </head>
 <body>
 
-  <!-- ВЕРХ: счётчик баланса с иконкой кубика -->
+  <!-- ВЕРХ: счёт + кнопка «?» -->
   <header class="topbar">
-    <div class="balance-card">
-      <div class="balance-info">
-        <div class="balance-label">Ваш счёт</div>
+    <div class="balance-block">
+      <div class="balance-label">Ваш счёт</div>
+      <div class="balance-row">
         <div class="balance-value" id="balance">0</div>
-      </div>
-      <div class="balance-icon">
-        <svg viewBox="0 0 40 40" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
-          <defs>
-            <linearGradient id="cubeFace" x1="0" y1="0" x2="1" y2="1">
-              <stop offset="0%"   stop-color="#EAF6FF"/>
-              <stop offset="50%"  stop-color="#BFE3F5"/>
-              <stop offset="100%" stop-color="#7FB8D9"/>
-            </linearGradient>
-            <linearGradient id="cubeTop" x1="0" y1="0" x2="0" y2="1">
-              <stop offset="0%"   stop-color="#FFFFFF"/>
-              <stop offset="100%" stop-color="#DCEEF8"/>
-            </linearGradient>
-            <linearGradient id="cubeSide" x1="0" y1="0" x2="0" y2="1">
-              <stop offset="0%"   stop-color="#9CC7E0"/>
-              <stop offset="100%" stop-color="#4A7BA3"/>
-            </linearGradient>
-          </defs>
-          <polygon points="20,4 36,12 20,20 4,12" fill="url(#cubeTop)"/>
-          <polygon points="4,12 20,20 20,36 4,28" fill="url(#cubeFace)"/>
-          <polygon points="36,12 36,28 20,36 20,20" fill="url(#cubeSide)"/>
-          <polygon points="20,6 30,11 20,15 10,11" fill="#FFFFFF" opacity="0.6"/>
-        </svg>
+        <div class="balance-icon">
+          <svg viewBox="0 0 40 40" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+            <defs>
+              <linearGradient id="cubeFace" x1="0" y1="0" x2="1" y2="1">
+                <stop offset="0%"   stop-color="#EAF6FF"/>
+                <stop offset="50%"  stop-color="#BFE3F5"/>
+                <stop offset="100%" stop-color="#7FB8D9"/>
+              </linearGradient>
+              <linearGradient id="cubeTop" x1="0" y1="0" x2="0" y2="1">
+                <stop offset="0%"   stop-color="#FFFFFF"/>
+                <stop offset="100%" stop-color="#DCEEF8"/>
+              </linearGradient>
+              <linearGradient id="cubeSide" x1="0" y1="0" x2="0" y2="1">
+                <stop offset="0%"   stop-color="#9CC7E0"/>
+                <stop offset="100%" stop-color="#4A7BA3"/>
+              </linearGradient>
+            </defs>
+            <polygon points="20,4 36,12 20,20 4,12" fill="url(#cubeTop)"/>
+            <polygon points="4,12 20,20 20,36 4,28" fill="url(#cubeFace)"/>
+            <polygon points="36,12 36,28 20,36 20,20" fill="url(#cubeSide)"/>
+            <polygon points="20,6 30,11 20,15 10,11" fill="#FFFFFF" opacity="0.6"/>
+          </svg>
+        </div>
       </div>
     </div>
+
+    <button class="help-btn" aria-label="Помощь">?</button>
   </header>
 
   <!-- ЦЕНТР: айсберг -->
@@ -82,7 +84,7 @@
                 fill="url(#reflection)"/>
         </g>
 
-        <!-- ОСНОВНОЙ СИЛУЭТ АЙСБЕРГА (асимметричный) -->
+        <!-- ОСНОВНОЙ СИЛУЭТ -->
         <path d="M 60 320
                  L 90 260
                  L 130 200
@@ -100,7 +102,7 @@
                  L 100 325 Z"
               fill="url(#iceBody)"/>
 
-        <!-- ЛЕВАЯ ГРАНЬ — блик -->
+        <!-- ЛЕВАЯ ГРАНЬ -->
         <path d="M 60 320
                  L 90 260
                  L 130 200
@@ -113,7 +115,7 @@
                  L 110 320 Z"
               fill="url(#iceShine)" opacity="0.7"/>
 
-        <!-- ПРАВАЯ ГРАНЬ — тень -->
+        <!-- ПРАВАЯ ГРАНЬ -->
         <path d="M 225 100
                  L 240 130
                  L 270 150
@@ -126,7 +128,7 @@
                  L 235 160 Z"
               fill="url(#iceShadow)"/>
 
-        <!-- ВНУТРЕННИЕ ТРЕЩИНЫ -->
+        <!-- ТРЕЩИНЫ -->
         <g stroke="#7FB8D9" stroke-width="1.2" fill="none" opacity="0.55">
           <path d="M 210 60 L 205 130 L 220 180 L 200 250 L 215 320"/>
           <path d="M 175 200 L 200 220 L 240 230"/>
@@ -160,12 +162,13 @@
       </svg>
     </button>
 
-    <!-- Слой летящих кубиков -->
     <div class="cubes-layer" id="cubesLayer"></div>
   </main>
 
-  <!-- НИЗ: под будущие кнопки -->
-  <footer class="bottombar" id="bottombar"></footer>
+  <!-- НИЗ: подсказка -->
+  <footer class="hintbar">
+    <span class="hint-text">Кликни по айсбергу, чтобы добыть лёд</span>
+  </footer>
 
   <script>
     const balanceEl = document.getElementById('balance');
@@ -175,6 +178,13 @@
     let balance = 0;
     let lastClick = 0;
     const CLICK_COOLDOWN = 60;
+
+    // Формат числа с пробелами: 4 376 588
+    function formatNumber(n) {
+      return n.toLocaleString('ru-RU');
+    }
+
+    balanceEl.textContent = formatNumber(balance);
 
     btn.addEventListener('pointerdown', (e) => {
       const now = performance.now();
@@ -220,7 +230,7 @@
 
       cube.addEventListener('animationend', () => {
         balance += 1;
-        balanceEl.textContent = balance;
+        balanceEl.textContent = formatNumber(balance);
         balanceEl.classList.remove('pulse');
         void balanceEl.offsetWidth;
         balanceEl.classList.add('pulse');
