@@ -456,3 +456,37 @@ html, body {
   opacity: 0.9;
   font-weight: 600;
 }
+
+
+/* ================= ПРОФИЛЬ: статистика ================= */
+.profile-stats {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+}
+
+.stat-card {
+  background: var(--card-2);
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  padding: 14px 16px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.stat-card__label {
+  font-size: 13px;
+  color: var(--muted);
+  letter-spacing: 0.02em;
+}
+
+.stat-card__value {
+  font-size: 18px;
+  font-weight: 700;
+  color: var(--cream);
+  letter-spacing: -0.01em;
+}
