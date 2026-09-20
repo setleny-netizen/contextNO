@@ -233,26 +233,30 @@
           <div class="stat-card__value" id="statClickBonus">1</div>
         </div>
 
-        <!-- Блок сброса -->
-        <div class="reset-block" id="resetBlock">
+        <div class="reset-block">
           <button class="reset-btn" type="button" id="resetStartBtn">
             Сбросить прогресс
           </button>
-
-          <div class="reset-confirm" id="resetConfirm" hidden>
-            <div class="reset-confirm__text">
-              Сбросить весь прогресс? Это нельзя отменить.
-            </div>
-            <div class="reset-confirm__actions">
-              <button class="reset-btn reset-btn--danger" type="button" id="resetConfirmBtn">
-                Да, сбросить
-              </button>
-              <button class="reset-btn reset-btn--ghost" type="button" id="resetCancelBtn">
-                Отмена
-              </button>
-            </div>
-          </div>
         </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- МОДАЛКА: ПОДТВЕРЖДЕНИЕ СБРОСА -->
+  <div class="modal modal--center" id="confirmModal" aria-hidden="true">
+    <div class="modal__backdrop" data-close></div>
+    <div class="confirm" role="dialog" aria-label="Подтверждение сброса">
+      <div class="confirm__title">Сбросить прогресс?</div>
+      <div class="confirm__text">
+        Весь баланс, улучшения и статистика будут удалены. Это нельзя отменить.
+      </div>
+      <div class="confirm__actions">
+        <button class="confirm__btn confirm__btn--ghost" type="button" data-close>
+          Отмена
+        </button>
+        <button class="confirm__btn confirm__btn--danger" type="button" id="resetConfirmBtn">
+          Да, сбросить
+        </button>
       </div>
     </div>
   </div>
