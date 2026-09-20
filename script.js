@@ -21,7 +21,6 @@ function loadState() {
     const raw = localStorage.getItem(STORAGE_KEY);
     if (!raw) return defaultState();
     const parsed = JSON.parse(raw);
-    // Мягко сливаем с дефолтом — если чего-то нет, подставится
     return { ...defaultState(), ...parsed };
   } catch (e) {
     console.warn('Не удалось загрузить сохранение, стартуем с нуля', e);
@@ -126,7 +125,6 @@ svg.addEventListener('pointerdown', (e) => {
   const reward = getClickBonus();
   spawnCube(e.clientX, e.clientY, reward);
 
-  // Статистика: удар засчитываем сразу (не ждём долёта кубика)
   state.totalClicks += 1;
   saveState();
 });
@@ -193,7 +191,6 @@ function closeModal(modal) {
   modal.setAttribute('aria-hidden', 'true');
 }
 
-// Закрытие по backdrop или крестику
 document.querySelectorAll('.modal').forEach((m) => {
   m.addEventListener('click', (e) => {
     if (e.target.closest('[data-close]')) closeModal(m);
@@ -268,6 +265,39 @@ upgradesList.addEventListener('click', (e) => {
   renderUpgrades();
 });
 
+// ---------- Сброс прогресса ----------
+const resetStartBtn   = document.getElementById('resetStartBtn');
+const resetConfirm    = document.getElementById('resetConfirm');
+const resetConfirmBtn = document.getElementById('resetConfirmBtn');
+const resetCancelBtn  = document.getElementById('resetCancelBtn');
+
+function showResetConfirm() {
+  resetStartBtn.hidden = true;
+  resetConfirm.hidden  = false;
+}
+
+function hideResetConfirm() {
+  resetStartBtn.hidden = false;
+  resetConfirm.hidden  = true;
+}
+
+resetStartBtn.addEventListener('click', showResetConfirm);
+resetCancelBtn.addEventListener('click', hideResetConfirm);
+
+resetConfirmBtn.addEventListener('click', () => {
+  const fresh = defaultState();
+  Object.keys(state).forEach((k) => delete state[k]);
+  Object.assign(state, fresh);
+
+  localStorage.removeItem(STORAGE_KEY);
+
+  updateBalanceUI();
+  updateProfileUI();
+  hideResetConfirm();
+
+  console.log('Прогресс сброшен');
+});
+
 // ---------- Нижнее меню ----------
 navButtons.forEach((navBtn) => {
   navBtn.addEventListener('click', () => {
@@ -279,6 +309,7 @@ navButtons.forEach((navBtn) => {
       renderUpgrades();
       openModal(upgradesModal);
     } else if (tab === 'profile') {
+      hideResetConfirm();
       updateProfileUI();
       openModal(profileModal);
     } else {
