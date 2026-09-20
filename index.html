@@ -41,10 +41,10 @@
     </div>
   </header>
 
-  <!-- ЦЕНТР: айсберг (SVG) -->
+  <!-- ЦЕНТР: айсберг -->
   <main class="stage">
-    <div class="iceberg-wrap">
-      <svg class="iceberg-svg" id="iceberg" viewBox="0 0 400 420" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+    <button class="iceberg-btn" id="icebergBtn" aria-label="Клик по айсбергу">
+      <svg class="iceberg-svg" viewBox="0 0 400 420" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
         <defs>
           <linearGradient id="iceBody" x1="0" y1="0" x2="0" y2="1">
             <stop offset="0%"   stop-color="#F2EFE6"/>
@@ -74,15 +74,15 @@
           </filter>
         </defs>
 
-        <!-- ОТРАЖЕНИЕ (не кликабельно) -->
-        <g filter="url(#softBlur)" opacity="0.55" pointer-events="none">
+        <!-- ОТРАЖЕНИЕ -->
+        <g filter="url(#softBlur)" opacity="0.55">
           <path d="M 60 320
                    L 100 360 L 200 370 L 300 355 L 340 320
                    L 340 380 L 60 380 Z"
                 fill="url(#reflection)"/>
         </g>
 
-        <!-- ОСНОВНОЙ СИЛУЭТ (кликабельный) -->
+        <!-- ОСНОВНОЙ СИЛУЭТ АЙСБЕРГА (асимметричный) -->
         <path d="M 60 320
                  L 90 260
                  L 130 200
@@ -134,7 +134,7 @@
           <path d="M 300 180 L 285 240 L 305 300"/>
         </g>
 
-        <!-- БОРОЗДЫ ВНИЗУ -->
+        <!-- БОРОЗДЫ -->
         <g stroke="#1B2A41" stroke-width="1" opacity="0.45">
           <line x1="120" y1="270" x2="118" y2="322"/>
           <line x1="150" y1="280" x2="148" y2="324"/>
@@ -144,10 +144,9 @@
           <line x1="295" y1="285" x2="293" y2="320"/>
         </g>
 
-        <!-- ЛИНИЯ ВОДЫ (не кликабельно) -->
+        <!-- ЛИНИЯ ВОДЫ -->
         <line x1="40" y1="325" x2="360" y2="325"
-              stroke="#7FB8D9" stroke-width="1.2" opacity="0.5"
-              pointer-events="none"/>
+              stroke="#7FB8D9" stroke-width="1.2" opacity="0.5"/>
 
         <!-- ИЗМОРОЗЬ -->
         <g fill="#FFFFFF" opacity="0.9">
@@ -159,43 +158,34 @@
           <circle cx="310" cy="260" r="1"/>
         </g>
       </svg>
-    </div>
+    </button>
 
     <!-- Слой летящих кубиков -->
     <div class="cubes-layer" id="cubesLayer"></div>
   </main>
 
   <!-- НИЗ: под будущие кнопки -->
-  <footer class="bottombar" id="bottombar">
-    <!-- кнопки добавим позже -->
-  </footer>
+  <footer class="bottombar" id="bottombar"></footer>
 
   <script>
-    // ===== MVP-логика клика =====
     const balanceEl = document.getElementById('balance');
-    const iceberg   = document.getElementById('iceberg');
-    const wrap      = document.querySelector('.iceberg-wrap');
+    const btn       = document.getElementById('icebergBtn');
     const layer     = document.getElementById('cubesLayer');
 
     let balance = 0;
     let lastClick = 0;
-    const CLICK_COOLDOWN = 60; // мс
+    const CLICK_COOLDOWN = 60;
 
-    // Клик ловим на самом SVG — срабатывает только по залитым фигурам
-    iceberg.addEventListener('pointerdown', (e) => {
+    btn.addEventListener('pointerdown', (e) => {
       const now = performance.now();
       if (now - lastClick < CLICK_COOLDOWN) return;
       lastClick = now;
 
-      // 1. Вздрагивание
-      wrap.classList.remove('hit');
-      void wrap.offsetWidth;
-      wrap.classList.add('hit');
+      btn.classList.remove('hit');
+      void btn.offsetWidth;
+      btn.classList.add('hit');
 
-      // 2. Трещина в точке клика
       spawnCrack(e.clientX, e.clientY);
-
-      // 3. Кубик, летящий в счётчик
       spawnCube(e.clientX, e.clientY);
     });
 
@@ -220,7 +210,6 @@
 
       const dx = targetX - startX;
       const dy = targetY - startY;
-
       const jitter = (Math.random() - 0.5) * 60;
 
       cube.style.setProperty('--dx', dx + 'px');
