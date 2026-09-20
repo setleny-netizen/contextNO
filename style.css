@@ -91,7 +91,7 @@ html, body {
   gap: 14px;
 }
 
-/* Обёртка айсберга: меньше размер, клик ловит SVG внутри */
+/* Обёртка айсберга */
 .iceberg-wrap {
   position: relative;
   width: 240px;
@@ -104,15 +104,11 @@ html, body {
   width: 100%;
   height: 100%;
   display: block;
-  /* клики ловит сам SVG — только по залитым фигурам (не по прозрачным углам) */
+  /* без filter — иначе в WebView появляется прямоугольная подложка */
   pointer-events: auto;
   cursor: pointer;
-  filter:
-    drop-shadow(0 12px 24px rgba(27,42,65,0.55))
-    drop-shadow(0 0 18px rgba(127,184,217,0.25));
 }
 
-/* Вздрагивание */
 .iceberg-wrap.hit {
   animation: hit 0.12s ease;
 }
@@ -190,7 +186,7 @@ html, body {
   }
 }
 
-/* ================= ПОДСКАЗКА (под айсбергом) ================= */
+/* ================= ПОДСКАЗКА ================= */
 .hintbar {
   text-align: center;
   pointer-events: none;
