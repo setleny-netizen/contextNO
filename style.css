@@ -1,0 +1,262 @@
+/* ============================================================
+   ЛОХМАТЫЙ КЛУБ — прототип стилей
+   Палитра:
+   #0A0A0A — фон
+   #1C1C1C — карточки
+   #C9A227 / #D4AF37 — золото
+   #F2EFE6 — текст/мех
+   #1B2A41 / #243B55 — тёмно-синий
+   ============================================================ */
+
+* { box-sizing: border-box; margin: 0; padding: 0; }
+
+:root {
+  --bg:        #0A0A0A;
+  --card:      #1C1C1C;
+  --gold:      #C9A227;
+  --gold-2:    #D4AF37;
+  --cream:     #F2EFE6;
+  --navy:      #1B2A41;
+  --navy-2:    #243B55;
+}
+
+html, body {
+  height: 100%;
+  background: var(--bg);
+  color: var(--cream);
+  font-family: 'Manrope', system-ui, -apple-system, sans-serif;
+  overflow: hidden;
+  -webkit-tap-highlight-color: transparent;
+  user-select: none;
+}
+
+/* Лёгкая виньетка на фоне — «нуарная» атмосфера */
+body::before {
+  content: '';
+  position: fixed; inset: 0;
+  background: radial-gradient(circle at 50% 40%, rgba(36,59,85,0.35), transparent 60%);
+  pointer-events: none;
+  z-index: 0;
+}
+
+/* ================= ВЕРХ: счётчик ================= */
+.topbar {
+  position: relative;
+  z-index: 2;
+  padding: calc(env(safe-area-inset-top, 0px) + 16px) 16px 12px;
+  display: flex;
+  justify-content: center;
+}
+
+.balance-card {
+  background: var(--card);
+  border: 1px solid var(--gold);
+  border-radius: 16px;
+  padding: 10px 22px;
+  text-align: center;
+  box-shadow: 0 0 24px rgba(201,162,39,0.15), inset 0 0 12px rgba(201,162,39,0.05);
+  min-width: 160px;
+}
+
+.balance-label {
+  font-family: 'Playfair Display', Georgia, serif;
+  font-size: 12px;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--gold-2);
+  margin-bottom: 2px;
+}
+
+.balance-value {
+  font-size: 28px;
+  font-weight: 700;
+  color: var(--cream);
+  transition: transform 0.15s ease;
+}
+
+.balance-value.pulse {
+  animation: pulse 0.3s ease;
+}
+@keyframes pulse {
+  0%   { transform: scale(1); color: var(--cream); }
+  50%  { transform: scale(1.25); color: var(--gold-2); }
+  100% { transform: scale(1); color: var(--cream); }
+}
+
+/* ================= ЦЕНТР: айсберг ================= */
+.stage {
+  position: relative;
+  z-index: 1;
+  height: calc(100vh - 220px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.iceberg-wrap {
+  position: relative;
+  width: 220px;
+  height: 260px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* Силуэт айсберга через clip-path */
+.iceberg {
+  position: relative;
+  width: 200px;
+  height: 220px;
+  clip-path: polygon(
+    50% 0%,    /* вершина */
+    68% 18%,
+    82% 40%,
+    95% 70%,
+    100% 100%,
+    0% 100%,
+    5% 70%,
+    18% 40%,
+    32% 18%
+  );
+  background:
+    /* лёд: верх — светлый, низ — глубже */
+    linear-gradient(180deg,
+      #EAF6FF 0%,
+      #BFE3F5 25%,
+      #7FB8D9 55%,
+      #3C6C93 85%,
+      #1B2A41 100%
+    );
+  box-shadow:
+    inset -20px 0 40px rgba(255,255,255,0.35),
+    inset 20px 0 60px rgba(27,42,65,0.6);
+  transition: transform 0.08s ease;
+  cursor: pointer;
+}
+
+/* Блик — «солнце по грани» */
+.iceberg__shine {
+  position: absolute;
+  left: 30%; top: 8%;
+  width: 30%; height: 60%;
+  background: linear-gradient(180deg, rgba(255,255,255,0.85), rgba(255,255,255,0));
+  filter: blur(6px);
+  transform: rotate(-8deg);
+  pointer-events: none;
+}
+
+/* Изморозь — точки/крапины */
+.iceberg__frost {
+  position: absolute; inset: 0;
+  background-image:
+    radial-gradient(circle at 20% 30%, rgba(255,255,255,0.9) 0 1px, transparent 2px),
+    radial-gradient(circle at 60% 20%, rgba(255,255,255,0.7) 0 1px, transparent 2px),
+    radial-gradient(circle at 75% 50%, rgba(255,255,255,0.8) 0 1px, transparent 2px),
+    radial-gradient(circle at 40% 65%, rgba(255,255,255,0.6) 0 1px, transparent 2px),
+    radial-gradient(circle at 55% 80%, rgba(255,255,255,0.7) 0 1px, transparent 2px);
+  background-size: 100% 100%;
+  opacity: 0.9;
+  pointer-events: none;
+}
+
+/* Тень под айсбергом */
+.iceberg__shadow {
+  position: absolute;
+  bottom: -18px;
+  width: 160px;
+  height: 22px;
+  background: radial-gradient(ellipse at center, rgba(127,184,217,0.35), transparent 70%);
+  filter: blur(6px);
+  pointer-events: none;
+}
+
+/* Вздрагивание при клике */
+.iceberg.hit {
+  animation: hit 0.12s ease;
+}
+@keyframes hit {
+  0%   { transform: translateY(0); }
+  50%  { transform: translateY(3px) scale(0.99); }
+  100% { transform: translateY(0); }
+}
+
+/* ================= Трещина в точке клика ================= */
+.crack {
+  position: fixed;
+  width: 24px; height: 24px;
+  pointer-events: none;
+  transform: translate(-50%, -50%);
+  z-index: 3;
+}
+.crack::before,
+.crack::after {
+  content: '';
+  position: absolute;
+  left: 50%; top: 50%;
+  width: 2px; height: 14px;
+  background: rgba(255,255,255,0.95);
+  border-radius: 2px;
+  transform-origin: center;
+  animation: crackFade 0.4s ease forwards;
+}
+.crack::before { transform: translate(-50%,-50%) rotate(25deg); }
+.crack::after  { transform: translate(-50%,-50%) rotate(-40deg); }
+
+@keyframes crackFade {
+  0%   { opacity: 1; }
+  100% { opacity: 0; transform: translate(-50%,-50%) rotate(var(--rot, 0)) scale(1.4); }
+}
+
+/* ================= Летящий кубик ================= */
+.cubes-layer {
+  position: fixed; inset: 0;
+  pointer-events: none;
+  z-index: 4;
+}
+
+.cube {
+  position: fixed;
+  width: 22px; height: 22px;
+  border-radius: 4px;
+  background: linear-gradient(135deg, #EAF6FF 0%, #BFE3F5 40%, #7FB8D9 100%);
+  box-shadow:
+    inset 2px 2px 4px rgba(255,255,255,0.9),
+    inset -2px -2px 6px rgba(27,42,65,0.4),
+    0 0 10px rgba(191,227,245,0.7);
+  transform: translate(-50%, -50%);
+  animation: flyToBalance 0.7s cubic-bezier(0.5, -0.3, 0.7, 1.2) forwards;
+}
+
+/* Полёт по дуге: сначала вверх и в сторону (jitter), потом к цели */
+@keyframes flyToBalance {
+  0% {
+    transform: translate(-50%, -50%) scale(1) rotate(0deg);
+    opacity: 1;
+  }
+  40% {
+    transform:
+      translate(calc(-50% + var(--dx) * 0.4 + var(--jx)),
+                calc(-50% + var(--dy) * 0.4 - 40px))
+      scale(1.1) rotate(120deg);
+    opacity: 1;
+  }
+  100% {
+    transform:
+      translate(calc(-50% + var(--dx)),
+                calc(-50% + var(--dy)))
+      scale(0.3) rotate(360deg);
+    opacity: 0;
+  }
+}
+
+/* ================= НИЗ: пусто под будущие кнопки ================= */
+.bottombar {
+  position: fixed;
+  left: 0; right: 0; bottom: 0;
+  padding: 12px 16px calc(env(safe-area-inset-bottom, 0px) + 12px);
+  display: flex;
+  gap: 10px;
+  justify-content: center;
+  z-index: 5;
+  /* пусто — кнопки добавим по твоим указаниям */
+}
