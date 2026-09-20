@@ -43,11 +43,18 @@ html, body {
   background: var(--card);
   border: 1px solid var(--gold);
   border-radius: 16px;
-  padding: 10px 22px;
-  text-align: center;
+  padding: 10px 18px;
   box-shadow: 0 0 24px rgba(201,162,39,0.15),
               inset 0 0 12px rgba(201,162,39,0.05);
-  min-width: 160px;
+  min-width: 180px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 14px;
+}
+
+.balance-info {
+  text-align: left;
 }
 
 .balance-label {
@@ -75,6 +82,19 @@ html, body {
   100% { transform: scale(1);    color: var(--cream); }
 }
 
+/* Иконка кубика льда справа от баланса */
+.balance-icon {
+  width: 40px;
+  height: 40px;
+  flex-shrink: 0;
+  filter: drop-shadow(0 0 8px rgba(191,227,245,0.55));
+}
+.balance-icon svg {
+  width: 100%;
+  height: 100%;
+  display: block;
+}
+
 /* ================= ЦЕНТР: сцена с айсбергом ================= */
 .stage {
   position: relative;
@@ -93,17 +113,17 @@ html, body {
   align-items: center;
   justify-content: center;
   transition: transform 0.08s ease;
-  cursor: pointer;
 }
 
 .iceberg-svg {
   width: 100%;
   height: 100%;
   display: block;
+  pointer-events: auto;   /* клики ловит сам SVG, только по залитым фигурам */
+  cursor: pointer;
   filter:
     drop-shadow(0 12px 24px rgba(27,42,65,0.55))
     drop-shadow(0 0 18px rgba(127,184,217,0.25));
-  pointer-events: none;
 }
 
 /* Вздрагивание при клике */
