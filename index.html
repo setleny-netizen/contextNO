@@ -8,20 +8,44 @@
 </head>
 <body>
 
-  <!-- ВЕРХ: счётчик баланса -->
+  <!-- ВЕРХ: счётчик баланса с иконкой кубика -->
   <header class="topbar">
     <div class="balance-card">
-      <div class="balance-label">ВАШ СЧЁТ</div>
-      <div class="balance-value" id="balance">0</div>
+      <div class="balance-info">
+        <div class="balance-label">Ваш счёт</div>
+        <div class="balance-value" id="balance">0</div>
+      </div>
+      <div class="balance-icon">
+        <svg viewBox="0 0 40 40" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+          <defs>
+            <linearGradient id="cubeFace" x1="0" y1="0" x2="1" y2="1">
+              <stop offset="0%"   stop-color="#EAF6FF"/>
+              <stop offset="50%"  stop-color="#BFE3F5"/>
+              <stop offset="100%" stop-color="#7FB8D9"/>
+            </linearGradient>
+            <linearGradient id="cubeTop" x1="0" y1="0" x2="0" y2="1">
+              <stop offset="0%"   stop-color="#FFFFFF"/>
+              <stop offset="100%" stop-color="#DCEEF8"/>
+            </linearGradient>
+            <linearGradient id="cubeSide" x1="0" y1="0" x2="0" y2="1">
+              <stop offset="0%"   stop-color="#9CC7E0"/>
+              <stop offset="100%" stop-color="#4A7BA3"/>
+            </linearGradient>
+          </defs>
+          <polygon points="20,4 36,12 20,20 4,12" fill="url(#cubeTop)"/>
+          <polygon points="4,12 20,20 20,36 4,28" fill="url(#cubeFace)"/>
+          <polygon points="36,12 36,28 20,36 20,20" fill="url(#cubeSide)"/>
+          <polygon points="20,6 30,11 20,15 10,11" fill="#FFFFFF" opacity="0.6"/>
+        </svg>
+      </div>
     </div>
   </header>
 
   <!-- ЦЕНТР: айсберг (SVG) -->
   <main class="stage">
-    <div class="iceberg-wrap" id="iceberg">
-      <svg class="iceberg-svg" viewBox="0 0 400 420" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+    <div class="iceberg-wrap">
+      <svg class="iceberg-svg" id="iceberg" viewBox="0 0 400 420" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
         <defs>
-          <!-- Основной градиент льда -->
           <linearGradient id="iceBody" x1="0" y1="0" x2="0" y2="1">
             <stop offset="0%"   stop-color="#F2EFE6"/>
             <stop offset="30%"  stop-color="#DCEEF8"/>
@@ -30,19 +54,16 @@
             <stop offset="100%" stop-color="#1B2A41"/>
           </linearGradient>
 
-          <!-- Блик на левой грани -->
           <linearGradient id="iceShine" x1="0" y1="0" x2="1" y2="1">
             <stop offset="0%"   stop-color="#FFFFFF" stop-opacity="0.95"/>
             <stop offset="100%" stop-color="#FFFFFF" stop-opacity="0"/>
           </linearGradient>
 
-          <!-- Правая грань — в тени -->
           <linearGradient id="iceShadow" x1="0" y1="0" x2="0" y2="1">
             <stop offset="0%"   stop-color="#243B55" stop-opacity="0.55"/>
             <stop offset="100%" stop-color="#1B2A41" stop-opacity="0.85"/>
           </linearGradient>
 
-          <!-- Отражение -->
           <linearGradient id="reflection" x1="0" y1="0" x2="0" y2="1">
             <stop offset="0%"   stop-color="#7FB8D9" stop-opacity="0.55"/>
             <stop offset="100%" stop-color="#1B2A41" stop-opacity="0"/>
@@ -53,15 +74,15 @@
           </filter>
         </defs>
 
-        <!-- ОТРАЖЕНИЕ -->
-        <g filter="url(#softBlur)" opacity="0.55">
+        <!-- ОТРАЖЕНИЕ (не кликабельно) -->
+        <g filter="url(#softBlur)" opacity="0.55" pointer-events="none">
           <path d="M 60 320
                    L 100 360 L 200 370 L 300 355 L 340 320
                    L 340 380 L 60 380 Z"
                 fill="url(#reflection)"/>
         </g>
 
-        <!-- ОСНОВНОЙ СИЛУЭТ -->
+        <!-- ОСНОВНОЙ СИЛУЭТ (кликабельный) -->
         <path d="M 60 320
                  L 90 260
                  L 130 200
@@ -123,9 +144,10 @@
           <line x1="295" y1="285" x2="293" y2="320"/>
         </g>
 
-        <!-- ЛИНИЯ ВОДЫ -->
+        <!-- ЛИНИЯ ВОДЫ (не кликабельно) -->
         <line x1="40" y1="325" x2="360" y2="325"
-              stroke="#7FB8D9" stroke-width="1.2" opacity="0.5"/>
+              stroke="#7FB8D9" stroke-width="1.2" opacity="0.5"
+              pointer-events="none"/>
 
         <!-- ИЗМОРОЗЬ -->
         <g fill="#FFFFFF" opacity="0.9">
@@ -152,21 +174,23 @@
     // ===== MVP-логика клика =====
     const balanceEl = document.getElementById('balance');
     const iceberg   = document.getElementById('iceberg');
+    const wrap      = document.querySelector('.iceberg-wrap');
     const layer     = document.getElementById('cubesLayer');
 
     let balance = 0;
     let lastClick = 0;
     const CLICK_COOLDOWN = 60; // мс
 
+    // Клик ловим на самом SVG — срабатывает только по залитым фигурам
     iceberg.addEventListener('pointerdown', (e) => {
       const now = performance.now();
       if (now - lastClick < CLICK_COOLDOWN) return;
       lastClick = now;
 
       // 1. Вздрагивание
-      iceberg.classList.remove('hit');
-      void iceberg.offsetWidth;
-      iceberg.classList.add('hit');
+      wrap.classList.remove('hit');
+      void wrap.offsetWidth;
+      wrap.classList.add('hit');
 
       // 2. Трещина в точке клика
       spawnCrack(e.clientX, e.clientY);
@@ -197,7 +221,6 @@
       const dx = targetX - startX;
       const dy = targetY - startY;
 
-      // Случайное отклонение по X
       const jitter = (Math.random() - 0.5) * 60;
 
       cube.style.setProperty('--dx', dx + 'px');
