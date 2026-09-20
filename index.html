@@ -232,6 +232,27 @@
           <div class="stat-card__label">Добыча за клик</div>
           <div class="stat-card__value" id="statClickBonus">1</div>
         </div>
+
+        <!-- Блок сброса -->
+        <div class="reset-block" id="resetBlock">
+          <button class="reset-btn" type="button" id="resetStartBtn">
+            Сбросить прогресс
+          </button>
+
+          <div class="reset-confirm" id="resetConfirm" hidden>
+            <div class="reset-confirm__text">
+              Сбросить весь прогресс? Это нельзя отменить.
+            </div>
+            <div class="reset-confirm__actions">
+              <button class="reset-btn reset-btn--danger" type="button" id="resetConfirmBtn">
+                Да, сбросить
+              </button>
+              <button class="reset-btn reset-btn--ghost" type="button" id="resetCancelBtn">
+                Отмена
+              </button>
+            </div>
+          </div>
+        </div>
       </div>
     </div>
   </div>
