@@ -41,10 +41,11 @@
     </div>
   </header>
 
-  <!-- ЦЕНТР: айсберг -->
+  <!-- ЦЕНТР: айсберг + подсказка -->
   <main class="stage">
-    <button class="iceberg-btn" id="icebergBtn" aria-label="Клик по айсбергу">
-      <svg class="iceberg-svg" viewBox="0 0 400 420" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+    <div class="iceberg-wrap" id="icebergWrap">
+      <svg class="iceberg-svg" id="icebergSvg" viewBox="0 0 400 420"
+           xmlns="http://www.w3.org/2000/svg" aria-label="Айсберг">
         <defs>
           <linearGradient id="iceBody" x1="0" y1="0" x2="0" y2="1">
             <stop offset="0%"   stop-color="#F2EFE6"/>
@@ -70,32 +71,38 @@
           </filter>
         </defs>
 
-        <g filter="url(#softBlur)" opacity="0.55">
+        <!-- ОТРАЖЕНИЕ (некликабельно) -->
+        <g filter="url(#softBlur)" opacity="0.55" pointer-events="none">
           <path d="M 60 320 L 100 360 L 200 370 L 300 355 L 340 320 L 340 380 L 60 380 Z"
                 fill="url(#reflection)"/>
         </g>
 
+        <!-- ОСНОВНОЙ СИЛУЭТ — кликабельно -->
         <path d="M 60 320 L 90 260 L 130 200 L 170 150 L 195 90 L 210 60
                  L 225 100 L 240 130 L 270 150 L 300 180 L 330 230 L 345 280
                  L 340 320 L 200 330 L 100 325 Z"
               fill="url(#iceBody)"/>
 
+        <!-- ЛЕВАЯ ГРАНЬ (внутри силуэта — кликабельно) -->
         <path d="M 60 320 L 90 260 L 130 200 L 170 150 L 195 90 L 210 60
                  L 200 130 L 175 200 L 140 270 L 110 320 Z"
               fill="url(#iceShine)" opacity="0.7"/>
 
+        <!-- ПРАВАЯ ГРАНЬ (внутри силуэта — кликабельно) -->
         <path d="M 225 100 L 240 130 L 270 150 L 300 180 L 330 230 L 345 280
                  L 340 320 L 260 325 L 250 230 L 235 160 Z"
               fill="url(#iceShadow)"/>
 
-        <g stroke="#7FB8D9" stroke-width="1.2" fill="none" opacity="0.55">
+        <!-- ТРЕЩИНЫ (декор — не кликабельно) -->
+        <g stroke="#7FB8D9" stroke-width="1.2" fill="none" opacity="0.55" pointer-events="none">
           <path d="M 210 60 L 205 130 L 220 180 L 200 250 L 215 320"/>
           <path d="M 175 200 L 200 220 L 240 230"/>
           <path d="M 130 200 L 160 240 L 150 300"/>
           <path d="M 300 180 L 285 240 L 305 300"/>
         </g>
 
-        <g stroke="#1B2A41" stroke-width="1" opacity="0.45">
+        <!-- БОРОЗДЫ (декор — не кликабельно) -->
+        <g stroke="#1B2A41" stroke-width="1" opacity="0.45" pointer-events="none">
           <line x1="120" y1="270" x2="118" y2="322"/>
           <line x1="150" y1="280" x2="148" y2="324"/>
           <line x1="185" y1="285" x2="183" y2="326"/>
@@ -104,10 +111,13 @@
           <line x1="295" y1="285" x2="293" y2="320"/>
         </g>
 
+        <!-- ЛИНИЯ ВОДЫ (не кликабельно) -->
         <line x1="40" y1="325" x2="360" y2="325"
-              stroke="#7FB8D9" stroke-width="1.2" opacity="0.5"/>
+              stroke="#7FB8D9" stroke-width="1.2" opacity="0.5"
+              pointer-events="none"/>
 
-        <g fill="#FFFFFF" opacity="0.9">
+        <!-- ИЗМОРОЗЬ (декор — не кликабельно) -->
+        <g fill="#FFFFFF" opacity="0.9" pointer-events="none">
           <circle cx="180" cy="140" r="1.2"/>
           <circle cx="205" cy="170" r="1"/>
           <circle cx="230" cy="200" r="1.1"/>
@@ -116,21 +126,19 @@
           <circle cx="310" cy="260" r="1"/>
         </g>
       </svg>
-    </button>
+    </div>
 
     <div class="cubes-layer" id="cubesLayer"></div>
-  </main>
 
-  <!-- ПОДСКАЗКА: над меню -->
-  <div class="hintbar">
-    <span class="hint-text">Кликни по айсбергу, чтобы добыть лёд</span>
-  </div>
+    <div class="hintbar">
+      <span class="hint-text">Кликните по айсбергу, чтобы добыть лёд</span>
+    </div>
+  </main>
 
   <!-- НИЖНЕЕ МЕНЮ -->
   <nav class="bottomnav" id="bottomnav">
     <button class="nav-btn" data-tab="upgrades" type="button">
       <span class="nav-icon">
-        <!-- Иконка «Улучшения» — стрелка вверх в круге -->
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"
              stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
           <circle cx="12" cy="12" r="9"/>
@@ -143,7 +151,6 @@
 
     <button class="nav-btn" data-tab="earn" type="button">
       <span class="nav-icon">
-        <!-- Иконка «Заработок» — монета -->
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"
              stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
           <circle cx="12" cy="12" r="9"/>
@@ -156,7 +163,6 @@
 
     <button class="nav-btn" data-tab="profile" type="button">
       <span class="nav-icon">
-        <!-- Иконка «Профиль» — силуэт -->
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"
              stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
           <circle cx="12" cy="8" r="3.5"/>
@@ -170,7 +176,8 @@
   <script>
     // ===== Логика клика по айсбергу =====
     const balanceEl = document.getElementById('balance');
-    const btn       = document.getElementById('icebergBtn');
+    const wrap      = document.getElementById('icebergWrap');
+    const svg       = document.getElementById('icebergSvg');
     const layer     = document.getElementById('cubesLayer');
 
     let balance = 0;
@@ -183,14 +190,16 @@
 
     balanceEl.textContent = formatNumber(balance);
 
-    btn.addEventListener('pointerdown', (e) => {
+    // Клик ловим на SVG — срабатывает только по залитым фигурам
+    svg.addEventListener('pointerdown', (e) => {
       const now = performance.now();
       if (now - lastClick < CLICK_COOLDOWN) return;
       lastClick = now;
 
-      btn.classList.remove('hit');
-      void btn.offsetWidth;
-      btn.classList.add('hit');
+      // Вздрагивание — на обёртку
+      wrap.classList.remove('hit');
+      void wrap.offsetWidth;
+      wrap.classList.add('hit');
 
       spawnCrack(e.clientX, e.clientY);
       spawnCube(e.clientX, e.clientY);
@@ -235,23 +244,18 @@
       });
     }
 
-    // ===== Логика нижнего меню =====
+    // ===== Нижнее меню =====
     const navButtons = document.querySelectorAll('.nav-btn');
 
     navButtons.forEach((navBtn) => {
       navBtn.addEventListener('click', () => {
-        // Снять активность со всех
         navButtons.forEach((b) => b.classList.remove('active'));
-        // Поставить на нажатую
         navBtn.classList.add('active');
-
-        // Здесь позже: открытие экрана/модалки по data-tab
         const tab = navBtn.dataset.tab;
         console.log('Открыть вкладку:', tab);
       });
     });
 
-    // По умолчанию — активна вкладка «Улучшения»
     document.querySelector('.nav-btn[data-tab="upgrades"]')?.classList.add('active');
   </script>
 </body>
