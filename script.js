@@ -8,10 +8,10 @@ const STORAGE_KEY = 'lohmaty_club_state_v1';
 function defaultState() {
   return {
     balance: 0,
-    totalEarned: 0,     // всего добыто за всё время
-    totalClicks: 0,     // ударов по айсбергу
-    clickLevels: {},    // { upgradeId: level }
-    passiveLevels: {},  // { upgradeId: level }
+    totalEarned: 0,
+    totalClicks: 0,
+    clickLevels: {},
+    passiveLevels: {},
   };
 }
 
@@ -63,6 +63,7 @@ const svg           = document.getElementById('icebergSvg');
 const layer         = document.getElementById('cubesLayer');
 const upgradesModal = document.getElementById('upgradesModal');
 const profileModal  = document.getElementById('profileModal');
+const confirmModal  = document.getElementById('confirmModal');
 const upgradesList  = document.getElementById('upgradesList');
 const navButtons    = document.querySelectorAll('.nav-btn');
 const tabs          = document.querySelectorAll('.tab');
@@ -191,6 +192,7 @@ function closeModal(modal) {
   modal.setAttribute('aria-hidden', 'true');
 }
 
+// Универсальное закрытие по backdrop или крестику
 document.querySelectorAll('.modal').forEach((m) => {
   m.addEventListener('click', (e) => {
     if (e.target.closest('[data-close]')) closeModal(m);
@@ -267,23 +269,14 @@ upgradesList.addEventListener('click', (e) => {
 
 // ---------- Сброс прогресса ----------
 const resetStartBtn   = document.getElementById('resetStartBtn');
-const resetConfirm    = document.getElementById('resetConfirm');
 const resetConfirmBtn = document.getElementById('resetConfirmBtn');
-const resetCancelBtn  = document.getElementById('resetCancelBtn');
 
-function showResetConfirm() {
-  resetStartBtn.hidden = true;
-  resetConfirm.hidden  = false;
-}
+// Открыть окно подтверждения
+resetStartBtn.addEventListener('click', () => {
+  openModal(confirmModal);
+});
 
-function hideResetConfirm() {
-  resetStartBtn.hidden = false;
-  resetConfirm.hidden  = true;
-}
-
-resetStartBtn.addEventListener('click', showResetConfirm);
-resetCancelBtn.addEventListener('click', hideResetConfirm);
-
+// Подтвердить сброс
 resetConfirmBtn.addEventListener('click', () => {
   const fresh = defaultState();
   Object.keys(state).forEach((k) => delete state[k]);
@@ -293,9 +286,8 @@ resetConfirmBtn.addEventListener('click', () => {
 
   updateBalanceUI();
   updateProfileUI();
-  hideResetConfirm();
-
-  console.log('Прогресс сброшен');
+  closeModal(confirmModal);
+  closeModal(profileModal);
 });
 
 // ---------- Нижнее меню ----------
@@ -309,7 +301,6 @@ navButtons.forEach((navBtn) => {
       renderUpgrades();
       openModal(upgradesModal);
     } else if (tab === 'profile') {
-      hideResetConfirm();
       updateProfileUI();
       openModal(profileModal);
     } else {
