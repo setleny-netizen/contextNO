@@ -5,13 +5,13 @@
 * { box-sizing: border-box; margin: 0; padding: 0; }
 
 :root {
-  --bg:        #0A0A0A;
-  --card:      #141414;
-  --border:    #1F1F1F;
-  --gold:      #C9A227;
-  --gold-2:    #D4AF37;
-  --cream:     #F2EFE6;
-  --muted:     #6E6E6E;
+  --bg:         #0A0A0A;
+  --card:       #141414;
+  --border:     #1F1F1F;
+  --gold:       #C9A227;
+  --gold-2:     #D4AF37;
+  --cream:      #F2EFE6;
+  --muted:      #6E6E6E;
   --nav-height: 72px;
 }
 
@@ -83,18 +83,19 @@ html, body {
 .stage {
   position: relative;
   z-index: 1;
-  height: calc(100vh - 260px - var(--nav-height));
+  height: calc(100vh - 220px - var(--nav-height));
   display: flex;
+  flex-direction: column;
   align-items: center;
   justify-content: center;
+  gap: 14px;
 }
 
-.iceberg-btn {
-  all: unset;
-  display: block;
-  width: 320px;
-  height: 340px;
-  cursor: pointer;
+/* Обёртка айсберга: меньше размер, клик ловит SVG внутри */
+.iceberg-wrap {
+  position: relative;
+  width: 240px;
+  height: 260px;
   transition: transform 0.08s ease;
   -webkit-tap-highlight-color: transparent;
 }
@@ -103,12 +104,16 @@ html, body {
   width: 100%;
   height: 100%;
   display: block;
+  /* клики ловит сам SVG — только по залитым фигурам (не по прозрачным углам) */
+  pointer-events: auto;
+  cursor: pointer;
   filter:
     drop-shadow(0 12px 24px rgba(27,42,65,0.55))
     drop-shadow(0 0 18px rgba(127,184,217,0.25));
 }
 
-.iceberg-btn.hit {
+/* Вздрагивание */
+.iceberg-wrap.hit {
   animation: hit 0.12s ease;
 }
 @keyframes hit {
@@ -185,13 +190,9 @@ html, body {
   }
 }
 
-/* ================= ПОДСКАЗКА (над меню) ================= */
+/* ================= ПОДСКАЗКА (под айсбергом) ================= */
 .hintbar {
-  position: fixed;
-  left: 0; right: 0;
-  bottom: calc(var(--nav-height) + env(safe-area-inset-bottom, 0px) + 8px);
   text-align: center;
-  z-index: 5;
   pointer-events: none;
 }
 
@@ -235,13 +236,8 @@ html, body {
   -webkit-tap-highlight-color: transparent;
 }
 
-.nav-btn:hover {
-  color: var(--cream);
-}
-
-.nav-btn.active {
-  color: var(--gold-2);
-}
+.nav-btn:hover { color: var(--cream); }
+.nav-btn.active { color: var(--gold-2); }
 
 .nav-btn.active .nav-icon {
   filter: drop-shadow(0 0 8px rgba(212,175,55,0.45));
@@ -255,11 +251,7 @@ html, body {
   justify-content: center;
   transition: filter 0.15s ease;
 }
-
-.nav-icon svg {
-  width: 100%;
-  height: 100%;
-}
+.nav-icon svg { width: 100%; height: 100%; }
 
 .nav-label {
   font-size: 11px;
