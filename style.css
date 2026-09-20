@@ -1,5 +1,11 @@
 /* ============================================================
    ЛОХМАТЫЙ КЛУБ — стили
+   Палитра:
+   #0A0A0A — фон
+   #1C1C1C — карточки
+   #C9A227 / #D4AF37 — золото
+   #F2EFE6 — текст/мех
+   #1B2A41 / #243B55 — тёмно-синий
    ============================================================ */
 
 * { box-sizing: border-box; margin: 0; padding: 0; }
@@ -12,6 +18,7 @@
   --cream:   #F2EFE6;
   --navy:    #1B2A41;
   --navy-2:  #243B55;
+  --muted:   #6E6E6E;
 }
 
 html, body {
@@ -24,44 +31,41 @@ html, body {
   user-select: none;
 }
 
-/* ================= ВЕРХ ================= */
+/* ================= ВЕРХ: счёт ================= */
 .topbar {
   position: relative;
   z-index: 2;
-  padding: calc(env(safe-area-inset-top, 0px) + 16px) 16px 12px;
-  display: flex;
-  justify-content: center;
+  padding: calc(env(safe-area-inset-top, 0px) + 22px) 16px 8px;
+  text-align: center;
 }
 
-.balance-card {
-  background: var(--card);
-  border: 1px solid var(--gold);
-  border-radius: 16px;
-  padding: 10px 18px;
-  box-shadow: 0 0 24px rgba(201,162,39,0.15),
-              inset 0 0 12px rgba(201,162,39,0.05);
-  min-width: 180px;
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 14px;
+.balance-block {
+  display: inline-block;
 }
-
-.balance-info { text-align: left; }
 
 .balance-label {
-  font-family: 'Playfair Display', Georgia, serif;
-  font-size: 12px;
+  font-size: 13px;
   letter-spacing: 0.18em;
   text-transform: uppercase;
   color: var(--gold-2);
-  margin-bottom: 2px;
+  opacity: 0.85;
+  margin-bottom: 6px;
+}
+
+.balance-row {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
 }
 
 .balance-value {
-  font-size: 28px;
-  font-weight: 700;
+  font-size: 40px;
+  font-weight: 800;
   color: var(--cream);
+  letter-spacing: -0.02em;
+  line-height: 1;
+  transition: transform 0.15s ease;
 }
 
 .balance-value.pulse {
@@ -69,29 +73,50 @@ html, body {
 }
 @keyframes pulse {
   0%   { transform: scale(1);    color: var(--cream); }
-  50%  { transform: scale(1.25); color: var(--gold-2); }
+  50%  { transform: scale(1.12); color: var(--gold-2); }
   100% { transform: scale(1);    color: var(--cream); }
 }
 
 .balance-icon {
-  width: 40px;
-  height: 40px;
+  width: 32px;
+  height: 32px;
   flex-shrink: 0;
   filter: drop-shadow(0 0 8px rgba(191,227,245,0.55));
 }
 .balance-icon svg { width: 100%; height: 100%; display: block; }
 
+/* Кнопка «?» в правом верхнем углу */
+.help-btn {
+  position: absolute;
+  top: calc(env(safe-area-inset-top, 0px) + 22px);
+  right: 16px;
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  border: 1px solid rgba(242,239,230,0.35);
+  background: transparent;
+  color: var(--cream);
+  font-size: 16px;
+  font-weight: 600;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  opacity: 0.7;
+  transition: opacity 0.15s ease, border-color 0.15s ease;
+}
+.help-btn:hover { opacity: 1; border-color: var(--gold); }
+
 /* ================= ЦЕНТР: айсберг ================= */
 .stage {
   position: relative;
   z-index: 1;
-  height: calc(100vh - 220px);
+  height: calc(100vh - 260px);
   display: flex;
   align-items: center;
   justify-content: center;
 }
 
-/* Кнопка-обёртка: сбрасываем стили кнопки браузера */
 .iceberg-btn {
   all: unset;
   display: block;
@@ -111,7 +136,6 @@ html, body {
     drop-shadow(0 0 18px rgba(127,184,217,0.25));
 }
 
-/* Вздрагивание */
 .iceberg-btn.hit {
   animation: hit 0.12s ease;
 }
@@ -189,13 +213,18 @@ html, body {
   }
 }
 
-/* ================= НИЗ ================= */
-.bottombar {
+/* ================= НИЗ: подсказка ================= */
+.hintbar {
   position: fixed;
   left: 0; right: 0; bottom: 0;
-  padding: 12px 16px calc(env(safe-area-inset-bottom, 0px) + 12px);
-  display: flex;
-  gap: 10px;
-  justify-content: center;
+  padding: 12px 16px calc(env(safe-area-inset-bottom, 0px) + 16px);
+  text-align: center;
   z-index: 5;
+  pointer-events: none;
+}
+
+.hint-text {
+  font-size: 13px;
+  color: var(--muted);
+  letter-spacing: 0.02em;
 }
