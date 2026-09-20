@@ -8,13 +8,14 @@
 </head>
 <body>
 
-  <!-- ВЕРХ: счёт + кнопка «?» -->
+  <!-- ВЕРХ: счёт по центру, «?» справа -->
   <header class="topbar">
+
     <div class="balance-block">
       <div class="balance-label">Ваш счёт</div>
       <div class="balance-row">
-        <div class="balance-value" id="balance">0</div>
-        <div class="balance-icon">
+        <span class="balance-value" id="balance">0</span>
+        <span class="balance-icon">
           <svg viewBox="0 0 40 40" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
             <defs>
               <linearGradient id="cubeFace" x1="0" y1="0" x2="1" y2="1">
@@ -36,7 +37,7 @@
             <polygon points="36,12 36,28 20,36 20,20" fill="url(#cubeSide)"/>
             <polygon points="20,6 30,11 20,15 10,11" fill="#FFFFFF" opacity="0.6"/>
           </svg>
-        </div>
+        </span>
       </div>
     </div>
 
@@ -55,80 +56,41 @@
             <stop offset="85%"  stop-color="#4A7BA3"/>
             <stop offset="100%" stop-color="#1B2A41"/>
           </linearGradient>
-
           <linearGradient id="iceShine" x1="0" y1="0" x2="1" y2="1">
             <stop offset="0%"   stop-color="#FFFFFF" stop-opacity="0.95"/>
             <stop offset="100%" stop-color="#FFFFFF" stop-opacity="0"/>
           </linearGradient>
-
           <linearGradient id="iceShadow" x1="0" y1="0" x2="0" y2="1">
             <stop offset="0%"   stop-color="#243B55" stop-opacity="0.55"/>
             <stop offset="100%" stop-color="#1B2A41" stop-opacity="0.85"/>
           </linearGradient>
-
           <linearGradient id="reflection" x1="0" y1="0" x2="0" y2="1">
             <stop offset="0%"   stop-color="#7FB8D9" stop-opacity="0.55"/>
             <stop offset="100%" stop-color="#1B2A41" stop-opacity="0"/>
           </linearGradient>
-
           <filter id="softBlur">
             <feGaussianBlur stdDeviation="3"/>
           </filter>
         </defs>
 
-        <!-- ОТРАЖЕНИЕ -->
         <g filter="url(#softBlur)" opacity="0.55">
-          <path d="M 60 320
-                   L 100 360 L 200 370 L 300 355 L 340 320
-                   L 340 380 L 60 380 Z"
+          <path d="M 60 320 L 100 360 L 200 370 L 300 355 L 340 320 L 340 380 L 60 380 Z"
                 fill="url(#reflection)"/>
         </g>
 
-        <!-- ОСНОВНОЙ СИЛУЭТ -->
-        <path d="M 60 320
-                 L 90 260
-                 L 130 200
-                 L 170 150
-                 L 195 90
-                 L 210 60
-                 L 225 100
-                 L 240 130
-                 L 270 150
-                 L 300 180
-                 L 330 230
-                 L 345 280
-                 L 340 320
-                 L 200 330
-                 L 100 325 Z"
+        <path d="M 60 320 L 90 260 L 130 200 L 170 150 L 195 90 L 210 60
+                 L 225 100 L 240 130 L 270 150 L 300 180 L 330 230 L 345 280
+                 L 340 320 L 200 330 L 100 325 Z"
               fill="url(#iceBody)"/>
 
-        <!-- ЛЕВАЯ ГРАНЬ -->
-        <path d="M 60 320
-                 L 90 260
-                 L 130 200
-                 L 170 150
-                 L 195 90
-                 L 210 60
-                 L 200 130
-                 L 175 200
-                 L 140 270
-                 L 110 320 Z"
+        <path d="M 60 320 L 90 260 L 130 200 L 170 150 L 195 90 L 210 60
+                 L 200 130 L 175 200 L 140 270 L 110 320 Z"
               fill="url(#iceShine)" opacity="0.7"/>
 
-        <!-- ПРАВАЯ ГРАНЬ -->
-        <path d="M 225 100
-                 L 240 130
-                 L 270 150
-                 L 300 180
-                 L 330 230
-                 L 345 280
-                 L 340 320
-                 L 260 325
-                 L 250 230
-                 L 235 160 Z"
+        <path d="M 225 100 L 240 130 L 270 150 L 300 180 L 330 230 L 345 280
+                 L 340 320 L 260 325 L 250 230 L 235 160 Z"
               fill="url(#iceShadow)"/>
 
-        <!-- ТРЕЩИНЫ -->
         <g stroke="#7FB8D9" stroke-width="1.2" fill="none" opacity="0.55">
           <path d="M 210 60 L 205 130 L 220 180 L 200 250 L 215 320"/>
           <path d="M 175 200 L 200 220 L 240 230"/>
@@ -136,7 +98,6 @@
           <path d="M 300 180 L 285 240 L 305 300"/>
         </g>
 
-        <!-- БОРОЗДЫ -->
         <g stroke="#1B2A41" stroke-width="1" opacity="0.45">
           <line x1="120" y1="270" x2="118" y2="322"/>
           <line x1="150" y1="280" x2="148" y2="324"/>
@@ -146,11 +107,9 @@
           <line x1="295" y1="285" x2="293" y2="320"/>
         </g>
 
-        <!-- ЛИНИЯ ВОДЫ -->
         <line x1="40" y1="325" x2="360" y2="325"
               stroke="#7FB8D9" stroke-width="1.2" opacity="0.5"/>
 
-        <!-- ИЗМОРОЗЬ -->
         <g fill="#FFFFFF" opacity="0.9">
           <circle cx="180" cy="140" r="1.2"/>
           <circle cx="205" cy="170" r="1"/>
@@ -165,7 +124,6 @@
     <div class="cubes-layer" id="cubesLayer"></div>
   </main>
 
-  <!-- НИЗ: подсказка -->
   <footer class="hintbar">
     <span class="hint-text">Кликни по айсбергу, чтобы добыть лёд</span>
   </footer>
@@ -179,7 +137,6 @@
     let lastClick = 0;
     const CLICK_COOLDOWN = 60;
 
-    // Формат числа с пробелами: 4 376 588
     function formatNumber(n) {
       return n.toLocaleString('ru-RU');
     }
