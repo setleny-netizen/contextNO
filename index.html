@@ -1,1 +1,112 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover, user-scalable=no" />
+  <title>Лохматый клуб</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
 
+  <!-- ВЕРХ: счётчик баланса -->
+  <header class="topbar">
+    <div class="balance-card">
+      <div class="balance-label">Кубики</div>
+      <div class="balance-value" id="balance">0</div>
+    </div>
+  </header>
+
+  <!-- ЦЕНТР: айсберг -->
+  <main class="stage">
+    <div class="iceberg-wrap">
+      <div class="iceberg" id="iceberg">
+        <div class="iceberg__shine"></div>
+        <div class="iceberg__frost"></div>
+      </div>
+      <div class="iceberg__shadow"></div>
+    </div>
+
+    <!-- Сюда JS будет спавнить летящие кубики -->
+    <div class="cubes-layer" id="cubesLayer"></div>
+  </main>
+
+  <!-- НИЗ: пока пусто, тут позже будут кнопки (магазин, ложа, профиль) -->
+  <footer class="bottombar" id="bottombar">
+    <!-- кнопки добавим позже по твоим указаниям -->
+  </footer>
+
+  <script>
+    // ==== MVP-логика клика ====
+    const balanceEl = document.getElementById('balance');
+    const iceberg   = document.getElementById('iceberg');
+    const layer     = document.getElementById('cubesLayer');
+
+    let balance = 0;
+
+    // Кулдаун, чтобы автокликер не спамил (на бэке будет строже)
+    let lastClick = 0;
+    const CLICK_COOLDOWN = 60; // мс
+
+    iceberg.addEventListener('pointerdown', (e) => {
+      const now = performance.now();
+      if (now - lastClick < CLICK_COOLDOWN) return;
+      lastClick = now;
+
+      // 1. Вздрагивание айсберга
+      iceberg.classList.remove('hit');
+      void iceberg.offsetWidth; // рестарт анимации
+      iceberg.classList.add('hit');
+
+      // 2. Трещина в точке клика
+      spawnCrack(e.clientX, e.clientY);
+
+      // 3. Спавн кубика, летящего в счётчик
+      spawnCube(e.clientX, e.clientY);
+    });
+
+    function spawnCrack(x, y) {
+      const crack = document.createElement('div');
+      crack.className = 'crack';
+      crack.style.left = x + 'px';
+      crack.style.top  = y + 'px';
+      document.body.appendChild(crack);
+      setTimeout(() => crack.remove(), 400);
+    }
+
+    function spawnCube(startX, startY) {
+      const cube = document.createElement('div');
+      cube.className = 'cube';
+      cube.style.left = startX + 'px';
+      cube.style.top  = startY + 'px';
+
+      // Считаем координаты цели — центра счётчика
+      const target = balanceEl.getBoundingClientRect();
+      const targetX = target.left + target.width / 2;
+      const targetY = target.top  + target.height / 2;
+
+      const dx = targetX - startX;
+      const dy = targetY - startY;
+
+      // Случайное отклонение по X для «живости»
+      const jitter = (Math.random() - 0.5) * 60;
+
+      // Передаём в CSS-переменные, чтобы keyframes знал, куда лететь
+      cube.style.setProperty('--dx', dx + 'px');
+      cube.style.setProperty('--dy', dy + 'px');
+      cube.style.setProperty('--jx', jitter + 'px');
+
+      layer.appendChild(cube);
+
+      // По завершении анимации — баланс +1 и удаление
+      cube.addEventListener('animationend', () => {
+        balance += 1;
+        balanceEl.textContent = balance;
+        balanceEl.classList.remove('pulse');
+        void balanceEl.offsetWidth;
+        balanceEl.classList.add('pulse');
+        cube.remove();
+      });
+    }
+  </script>
+</body>
+</html>
