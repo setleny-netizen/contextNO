@@ -38,6 +38,7 @@
           </svg>
         </span>
       </div>
+      <div class="balance-rate" id="balanceRate">+0 / сек</div>
     </div>
   </header>
 
@@ -71,34 +72,28 @@
           </filter>
         </defs>
 
-        <!-- ТЕНЬ ПОД АЙСБЕРГОМ (рисуется первой) -->
         <ellipse cx="200" cy="355" rx="130" ry="14"
                  fill="#1B2A41" opacity="0.55"
                  filter="url(#softBlur)" pointer-events="none"/>
 
-        <!-- ОТРАЖЕНИЕ (некликабельно) -->
         <g filter="url(#softBlur)" opacity="0.55" pointer-events="none">
           <path d="M 60 320 L 100 360 L 200 370 L 300 355 L 340 320 L 340 380 L 60 380 Z"
                 fill="url(#reflection)"/>
         </g>
 
-        <!-- ОСНОВНОЙ СИЛУЭТ — кликабельно -->
         <path d="M 60 320 L 90 260 L 130 200 L 170 150 L 195 90 L 210 60
                  L 225 100 L 240 130 L 270 150 L 300 180 L 330 230 L 345 280
                  L 340 320 L 200 330 L 100 325 Z"
               fill="url(#iceBody)"/>
 
-        <!-- ЛЕВАЯ ГРАНЬ -->
         <path d="M 60 320 L 90 260 L 130 200 L 170 150 L 195 90 L 210 60
                  L 200 130 L 175 200 L 140 270 L 110 320 Z"
               fill="url(#iceShine)" opacity="0.7"/>
 
-        <!-- ПРАВАЯ ГРАНЬ -->
         <path d="M 225 100 L 240 130 L 270 150 L 300 180 L 330 230 L 345 280
                  L 340 320 L 260 325 L 250 230 L 235 160 Z"
               fill="url(#iceShadow)"/>
 
-        <!-- ТРЕЩИНЫ -->
         <g stroke="#7FB8D9" stroke-width="1.2" fill="none" opacity="0.55" pointer-events="none">
           <path d="M 210 60 L 205 130 L 220 180 L 200 250 L 215 320"/>
           <path d="M 175 200 L 200 220 L 240 230"/>
@@ -106,7 +101,6 @@
           <path d="M 300 180 L 285 240 L 305 300"/>
         </g>
 
-        <!-- БОРОЗДЫ -->
         <g stroke="#1B2A41" stroke-width="1" opacity="0.45" pointer-events="none">
           <line x1="120" y1="270" x2="118" y2="322"/>
           <line x1="150" y1="280" x2="148" y2="324"/>
@@ -116,12 +110,10 @@
           <line x1="295" y1="285" x2="293" y2="320"/>
         </g>
 
-        <!-- ЛИНИЯ ВОДЫ -->
         <line x1="40" y1="325" x2="360" y2="325"
               stroke="#7FB8D9" stroke-width="1.2" opacity="0.5"
               pointer-events="none"/>
 
-        <!-- ИЗМОРОЗЬ -->
         <g fill="#FFFFFF" opacity="0.9" pointer-events="none">
           <circle cx="180" cy="140" r="1.2"/>
           <circle cx="205" cy="170" r="1"/>
@@ -178,89 +170,36 @@
     </button>
   </nav>
 
-  <script>
-    // ===== Логика клика по айсбергу =====
-    const balanceEl = document.getElementById('balance');
-    const wrap      = document.getElementById('icebergWrap');
-    const svg       = document.getElementById('icebergSvg');
-    const layer     = document.getElementById('cubesLayer');
+  <!-- МОДАЛКА: УЛУЧШЕНИЯ -->
+  <div class="modal" id="upgradesModal" aria-hidden="true">
+    <div class="modal__backdrop" data-close></div>
 
-    let balance = 0;
-    let lastClick = 0;
-    const CLICK_COOLDOWN = 60;
+    <div class="modal__sheet" role="dialog" aria-label="Улучшения">
+      <div class="modal__header">
+        <h2 class="modal__title">Улучшения</h2>
+        <button class="modal__close" type="button" data-close aria-label="Закрыть">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"
+               stroke-width="2" stroke-linecap="round" aria-hidden="true">
+            <path d="M6 6L18 18M18 6L6 18"/>
+          </svg>
+        </button>
+      </div>
 
-    function formatNumber(n) {
-      return n.toLocaleString('ru-RU');
-    }
+      <!-- Табы -->
+      <div class="tabs" role="tablist">
+        <button class="tab tab--active" data-tab-target="click" type="button" role="tab">
+          За клик
+        </button>
+        <button class="tab" data-tab-target="passive" type="button" role="tab">
+          В секунду
+        </button>
+      </div>
 
-    balanceEl.textContent = formatNumber(balance);
+      <!-- Список улучшений -->
+      <div class="upgrades-list" id="upgradesList"></div>
+    </div>
+  </div>
 
-    // Клик ловим на SVG — срабатывает только по залитым фигурам
-    svg.addEventListener('pointerdown', (e) => {
-      const now = performance.now();
-      if (now - lastClick < CLICK_COOLDOWN) return;
-      lastClick = now;
-
-      wrap.classList.remove('hit');
-      void wrap.offsetWidth;
-      wrap.classList.add('hit');
-
-      spawnCrack(e.clientX, e.clientY);
-      spawnCube(e.clientX, e.clientY);
-    });
-
-    function spawnCrack(x, y) {
-      const crack = document.createElement('div');
-      crack.className = 'crack';
-      crack.style.left = x + 'px';
-      crack.style.top  = y + 'px';
-      document.body.appendChild(crack);
-      setTimeout(() => crack.remove(), 400);
-    }
-
-    function spawnCube(startX, startY) {
-      const cube = document.createElement('div');
-      cube.className = 'cube';
-      cube.style.left = startX + 'px';
-      cube.style.top  = startY + 'px';
-
-      const target  = balanceEl.getBoundingClientRect();
-      const targetX = target.left + target.width  / 2;
-      const targetY = target.top  + target.height / 2;
-
-      const dx = targetX - startX;
-      const dy = targetY - startY;
-      const jitter = (Math.random() - 0.5) * 60;
-
-      cube.style.setProperty('--dx', dx + 'px');
-      cube.style.setProperty('--dy', dy + 'px');
-      cube.style.setProperty('--jx', jitter + 'px');
-
-      layer.appendChild(cube);
-
-      cube.addEventListener('animationend', () => {
-        balance += 1;
-        balanceEl.textContent = formatNumber(balance);
-        balanceEl.classList.remove('pulse');
-        void balanceEl.offsetWidth;
-        balanceEl.classList.add('pulse');
-        cube.remove();
-      });
-    }
-
-    // ===== Нижнее меню =====
-    const navButtons = document.querySelectorAll('.nav-btn');
-
-    navButtons.forEach((navBtn) => {
-      navBtn.addEventListener('click', () => {
-        navButtons.forEach((b) => b.classList.remove('active'));
-        navBtn.classList.add('active');
-        const tab = navBtn.dataset.tab;
-        console.log('Открыть вкладку:', tab);
-      });
-    });
-
-    document.querySelector('.nav-btn[data-tab="upgrades"]')?.classList.add('active');
-  </script>
+  <script src="script.js"></script>
 </body>
 </html>
