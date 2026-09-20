@@ -1,13 +1,43 @@
 // ============================================================
-// ЛОХМАТЫЙ КЛУБ — игровая логика (прототип, без бэкенда)
+// ЛОХМАТЫЙ КЛУБ — игровая логика (прототип, localStorage)
 // ============================================================
 
-// ---------- Состояние ----------
-const state = {
-  balance: 0,
-  clickLevels: {},   // { upgradeId: level }
-  passiveLevels: {}, // { upgradeId: level }
-};
+const STORAGE_KEY = 'lohmaty_club_state_v1';
+
+// ---------- Состояние по умолчанию ----------
+function defaultState() {
+  return {
+    balance: 0,
+    totalEarned: 0,     // всего добыто за всё время
+    totalClicks: 0,     // ударов по айсбергу
+    clickLevels: {},    // { upgradeId: level }
+    passiveLevels: {},  // { upgradeId: level }
+  };
+}
+
+// ---------- Загрузка / сохранение ----------
+function loadState() {
+  try {
+    const raw = localStorage.getItem(STORAGE_KEY);
+    if (!raw) return defaultState();
+    const parsed = JSON.parse(raw);
+    // Мягко сливаем с дефолтом — если чего-то нет, подставится
+    return { ...defaultState(), ...parsed };
+  } catch (e) {
+    console.warn('Не удалось загрузить сохранение, стартуем с нуля', e);
+    return defaultState();
+  }
+}
+
+function saveState() {
+  try {
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
+  } catch (e) {
+    console.warn('Не удалось сохранить', e);
+  }
+}
+
+const state = loadState();
 
 // ---------- Справочники улучшений ----------
 const CLICK_UPGRADES = [
@@ -19,10 +49,10 @@ const CLICK_UPGRADES = [
 ];
 
 const PASSIVE_UPGRADES = [
-  { id: 'fridge',   name: 'Холодильник',   bonus: 1,   basePrice: 100 },
-  { id: 'freezer',  name: 'Морозилка',     bonus: 5,   basePrice: 1000 },
-  { id: 'glacier',  name: 'Ледник',        bonus: 25,  basePrice: 10000 },
-  { id: 'farm',     name: 'Айсберг-ферма', bonus: 100, basePrice: 100000 },
+  { id: 'fridge',     name: 'Холодильник',     bonus: 1,   basePrice: 100 },
+  { id: 'freezer',    name: 'Морозилка',       bonus: 5,   basePrice: 1000 },
+  { id: 'glacier',    name: 'Ледник',          bonus: 25,  basePrice: 10000 },
+  { id: 'farm',       name: 'Айсберг-ферма',   bonus: 100, basePrice: 100000 },
   { id: 'permafrost', name: 'Вечная мерзлота', bonus: 500, basePrice: 1000000 },
 ];
 
@@ -32,7 +62,8 @@ const balanceRateEl = document.getElementById('balanceRate');
 const wrap          = document.getElementById('icebergWrap');
 const svg           = document.getElementById('icebergSvg');
 const layer         = document.getElementById('cubesLayer');
-const modal         = document.getElementById('upgradesModal');
+const upgradesModal = document.getElementById('upgradesModal');
+const profileModal  = document.getElementById('profileModal');
 const upgradesList  = document.getElementById('upgradesList');
 const navButtons    = document.querySelectorAll('.nav-btn');
 const tabs          = document.querySelectorAll('.tab');
@@ -60,7 +91,6 @@ function getPassiveBonus() {
 }
 
 function getUpgradePrice(upgrade, level) {
-  // Цена растёт ×1.15 за каждый уровень
   return Math.floor(upgrade.basePrice * Math.pow(1.15, level));
 }
 
@@ -68,6 +98,14 @@ function getUpgradePrice(upgrade, level) {
 function updateBalanceUI() {
   balanceEl.textContent = formatNumber(state.balance);
   balanceRateEl.textContent = `+${formatNumber(getPassiveBonus())} / сек`;
+}
+
+function updateProfileUI() {
+  document.getElementById('statTotalEarned').textContent = formatNumber(state.totalEarned);
+  document.getElementById('statClicks').textContent      = formatNumber(state.totalClicks);
+  document.getElementById('statBalance').textContent     = formatNumber(state.balance);
+  document.getElementById('statRate').textContent        = formatNumber(getPassiveBonus());
+  document.getElementById('statClickBonus').textContent  = formatNumber(getClickBonus());
 }
 
 // ---------- Клик по айсбергу ----------
@@ -84,7 +122,13 @@ svg.addEventListener('pointerdown', (e) => {
   wrap.classList.add('hit');
 
   spawnCrack(e.clientX, e.clientY);
-  spawnCube(e.clientX, e.clientY, getClickBonus());
+
+  const reward = getClickBonus();
+  spawnCube(e.clientX, e.clientY, reward);
+
+  // Статистика: удар засчитываем сразу (не ждём долёта кубика)
+  state.totalClicks += 1;
+  saveState();
 });
 
 function spawnCrack(x, y) {
@@ -117,8 +161,10 @@ function spawnCube(startX, startY, reward) {
   layer.appendChild(cube);
 
   cube.addEventListener('animationend', () => {
-    state.balance += reward;
+    state.balance     += reward;
+    state.totalEarned += reward;
     updateBalanceUI();
+    saveState();
     balanceEl.classList.remove('pulse');
     void balanceEl.offsetWidth;
     balanceEl.classList.add('pulse');
@@ -130,27 +176,31 @@ function spawnCube(startX, startY, reward) {
 setInterval(() => {
   const income = getPassiveBonus();
   if (income > 0) {
-    state.balance += income;
+    state.balance     += income;
+    state.totalEarned += income;
     updateBalanceUI();
+    saveState();
   }
 }, 1000);
 
-// ---------- Модалка ----------
-function openModal() {
+// ---------- Модалки ----------
+function openModal(modal) {
   modal.classList.add('open');
   modal.setAttribute('aria-hidden', 'false');
-  renderUpgrades();
 }
-function closeModal() {
+function closeModal(modal) {
   modal.classList.remove('open');
   modal.setAttribute('aria-hidden', 'true');
 }
 
-modal.addEventListener('click', (e) => {
-  if (e.target.closest('[data-close]')) closeModal();
+// Закрытие по backdrop или крестику
+document.querySelectorAll('.modal').forEach((m) => {
+  m.addEventListener('click', (e) => {
+    if (e.target.closest('[data-close]')) closeModal(m);
+  });
 });
 
-// ---------- Табы ----------
+// ---------- Табы улучшений ----------
 tabs.forEach((tab) => {
   tab.addEventListener('click', () => {
     tabs.forEach((t) => t.classList.remove('tab--active'));
@@ -160,17 +210,17 @@ tabs.forEach((tab) => {
   });
 });
 
-// ---------- Рендер списка улучшений ----------
+// ---------- Рендер улучшений ----------
 function renderUpgrades() {
-  const list = activeUpgradeTab === 'click' ? CLICK_UPGRADES : PASSIVE_UPGRADES;
+  const list   = activeUpgradeTab === 'click' ? CLICK_UPGRADES : PASSIVE_UPGRADES;
   const levels = activeUpgradeTab === 'click' ? state.clickLevels : state.passiveLevels;
   const suffix = activeUpgradeTab === 'click' ? 'к клику' : 'в секунду';
 
   upgradesList.innerHTML = '';
 
   list.forEach((upgrade) => {
-    const level = levels[upgrade.id] || 0;
-    const price = getUpgradePrice(upgrade, level);
+    const level  = levels[upgrade.id] || 0;
+    const price  = getUpgradePrice(upgrade, level);
     const canBuy = state.balance >= price;
 
     const card = document.createElement('div');
@@ -199,9 +249,9 @@ upgradesList.addEventListener('click', (e) => {
   const btn = e.target.closest('[data-buy]');
   if (!btn || btn.disabled) return;
 
-  const id = btn.dataset.buy;
-  const list = activeUpgradeTab === 'click' ? CLICK_UPGRADES : PASSIVE_UPGRADES;
-  const levels = activeUpgradeTab === 'click' ? state.clickLevels : state.passiveLevels;
+  const id      = btn.dataset.buy;
+  const list    = activeUpgradeTab === 'click' ? CLICK_UPGRADES : PASSIVE_UPGRADES;
+  const levels  = activeUpgradeTab === 'click' ? state.clickLevels : state.passiveLevels;
   const upgrade = list.find((u) => u.id === id);
   if (!upgrade) return;
 
@@ -214,6 +264,7 @@ upgradesList.addEventListener('click', (e) => {
   levels[id] = level + 1;
 
   updateBalanceUI();
+  saveState();
   renderUpgrades();
 });
 
@@ -225,15 +276,19 @@ navButtons.forEach((navBtn) => {
 
     const tab = navBtn.dataset.tab;
     if (tab === 'upgrades') {
-      openModal();
+      renderUpgrades();
+      openModal(upgradesModal);
+    } else if (tab === 'profile') {
+      updateProfileUI();
+      openModal(profileModal);
     } else {
       console.log('Открыть вкладку:', tab);
     }
   });
 });
 
-// По умолчанию — активна «Улучшения» (но модалку не открываем сразу)
-document.querySelector('.nav-btn[data-tab="upgrades"]')?.classList.add('active');
+// По умолчанию активна «Заработок»
+document.querySelector('.nav-btn[data-tab="earn"]')?.classList.add('active');
 
 // ---------- Инициализация ----------
 updateBalanceUI();
