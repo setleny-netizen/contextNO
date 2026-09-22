@@ -8,7 +8,7 @@
 </head>
 <body>
 
-  <!-- ВЕРХ: счёт -->
+  <!-- ВЕРХ: счёт (виден на всех экранах) -->
   <header class="topbar">
     <div class="balance-block">
       <div class="balance-label">Ваш счёт</div>
@@ -42,95 +42,176 @@
     </div>
   </header>
 
-  <!-- ЦЕНТР: айсберг -->
-  <main class="stage">
-    <div class="iceberg-wrap" id="icebergWrap">
-      <svg class="iceberg-svg" id="icebergSvg" viewBox="0 0 400 420"
-           xmlns="http://www.w3.org/2000/svg" aria-label="Айсберг">
-        <defs>
-          <linearGradient id="iceBody" x1="0" y1="0" x2="0" y2="1">
-            <stop offset="0%"   stop-color="#F2EFE6"/>
-            <stop offset="30%"  stop-color="#DCEEF8"/>
-            <stop offset="60%"  stop-color="#9CC7E0"/>
-            <stop offset="85%"  stop-color="#4A7BA3"/>
-            <stop offset="100%" stop-color="#1B2A41"/>
-          </linearGradient>
-          <linearGradient id="iceShine" x1="0" y1="0" x2="1" y2="1">
-            <stop offset="0%"   stop-color="#FFFFFF" stop-opacity="0.95"/>
-            <stop offset="100%" stop-color="#FFFFFF" stop-opacity="0"/>
-          </linearGradient>
-          <linearGradient id="iceShadow" x1="0" y1="0" x2="0" y2="1">
-            <stop offset="0%"   stop-color="#243B55" stop-opacity="0.55"/>
-            <stop offset="100%" stop-color="#1B2A41" stop-opacity="0.85"/>
-          </linearGradient>
-          <linearGradient id="reflection" x1="0" y1="0" x2="0" y2="1">
-            <stop offset="0%"   stop-color="#7FB8D9" stop-opacity="0.55"/>
-            <stop offset="100%" stop-color="#1B2A41" stop-opacity="0"/>
-          </linearGradient>
-          <filter id="softBlur" x="-50%" y="-50%" width="200%" height="200%">
-            <feGaussianBlur stdDeviation="3"/>
-          </filter>
-        </defs>
+  <!-- ЭКРАНЫ -->
+  <div class="screens" id="screens">
 
-        <ellipse cx="200" cy="355" rx="130" ry="14"
-                 fill="#1B2A41" opacity="0.55"
-                 filter="url(#softBlur)" pointer-events="none"/>
+    <!-- ЭКРАН: ИГРА -->
+    <section class="screen screen--active" id="screen-game">
+      <div class="iceberg-wrap" id="icebergWrap">
+        <svg class="iceberg-svg" id="icebergSvg" viewBox="0 0 400 420"
+             xmlns="http://www.w3.org/2000/svg" aria-label="Айсберг">
+          <defs>
+            <linearGradient id="iceBody" x1="0" y1="0" x2="0" y2="1">
+              <stop offset="0%"   stop-color="#F2EFE6"/>
+              <stop offset="30%"  stop-color="#DCEEF8"/>
+              <stop offset="60%"  stop-color="#9CC7E0"/>
+              <stop offset="85%"  stop-color="#4A7BA3"/>
+              <stop offset="100%" stop-color="#1B2A41"/>
+            </linearGradient>
+            <linearGradient id="iceShine" x1="0" y1="0" x2="1" y2="1">
+              <stop offset="0%"   stop-color="#FFFFFF" stop-opacity="0.95"/>
+              <stop offset="100%" stop-color="#FFFFFF" stop-opacity="0"/>
+            </linearGradient>
+            <linearGradient id="iceShadow" x1="0" y1="0" x2="0" y2="1">
+              <stop offset="0%"   stop-color="#243B55" stop-opacity="0.55"/>
+              <stop offset="100%" stop-color="#1B2A41" stop-opacity="0.85"/>
+            </linearGradient>
+            <linearGradient id="reflection" x1="0" y1="0" x2="0" y2="1">
+              <stop offset="0%"   stop-color="#7FB8D9" stop-opacity="0.55"/>
+              <stop offset="100%" stop-color="#1B2A41" stop-opacity="0"/>
+            </linearGradient>
+            <filter id="softBlur" x="-50%" y="-50%" width="200%" height="200%">
+              <feGaussianBlur stdDeviation="3"/>
+            </filter>
+          </defs>
 
-        <g filter="url(#softBlur)" opacity="0.55" pointer-events="none">
-          <path d="M 60 320 L 100 360 L 200 370 L 300 355 L 340 320 L 340 380 L 60 380 Z"
-                fill="url(#reflection)"/>
-        </g>
+          <ellipse cx="200" cy="355" rx="130" ry="14"
+                   fill="#1B2A41" opacity="0.55"
+                   filter="url(#softBlur)" pointer-events="none"/>
 
-        <path d="M 60 320 L 90 260 L 130 200 L 170 150 L 195 90 L 210 60
-                 L 225 100 L 240 130 L 270 150 L 300 180 L 330 230 L 345 280
-                 L 340 320 L 200 330 L 100 325 Z"
-              fill="url(#iceBody)"/>
+          <g filter="url(#softBlur)" opacity="0.55" pointer-events="none">
+            <path d="M 60 320 L 100 360 L 200 370 L 300 355 L 340 320 L 340 380 L 60 380 Z"
+                  fill="url(#reflection)"/>
+          </g>
 
-        <path d="M 60 320 L 90 260 L 130 200 L 170 150 L 195 90 L 210 60
-                 L 200 130 L 175 200 L 140 270 L 110 320 Z"
-              fill="url(#iceShine)" opacity="0.7"/>
+          <path d="M 60 320 L 90 260 L 130 200 L 170 150 L 195 90 L 210 60
+                   L 225 100 L 240 130 L 270 150 L 300 180 L 330 230 L 345 280
+                   L 340 320 L 200 330 L 100 325 Z"
+                fill="url(#iceBody)"/>
 
-        <path d="M 225 100 L 240 130 L 270 150 L 300 180 L 330 230 L 345 280
-                 L 340 320 L 260 325 L 250 230 L 235 160 Z"
-              fill="url(#iceShadow)"/>
+          <path d="M 60 320 L 90 260 L 130 200 L 170 150 L 195 90 L 210 60
+                   L 200 130 L 175 200 L 140 270 L 110 320 Z"
+                fill="url(#iceShine)" opacity="0.7"/>
 
-        <g stroke="#7FB8D9" stroke-width="1.2" fill="none" opacity="0.55" pointer-events="none">
-          <path d="M 210 60 L 205 130 L 220 180 L 200 250 L 215 320"/>
-          <path d="M 175 200 L 200 220 L 240 230"/>
-          <path d="M 130 200 L 160 240 L 150 300"/>
-          <path d="M 300 180 L 285 240 L 305 300"/>
-        </g>
+          <path d="M 225 100 L 240 130 L 270 150 L 300 180 L 330 230 L 345 280
+                   L 340 320 L 260 325 L 250 230 L 235 160 Z"
+                fill="url(#iceShadow)"/>
 
-        <g stroke="#1B2A41" stroke-width="1" opacity="0.45" pointer-events="none">
-          <line x1="120" y1="270" x2="118" y2="322"/>
-          <line x1="150" y1="280" x2="148" y2="324"/>
-          <line x1="185" y1="285" x2="183" y2="326"/>
-          <line x1="225" y1="290" x2="223" y2="325"/>
-          <line x1="260" y1="290" x2="258" y2="323"/>
-          <line x1="295" y1="285" x2="293" y2="320"/>
-        </g>
+          <g stroke="#7FB8D9" stroke-width="1.2" fill="none" opacity="0.55" pointer-events="none">
+            <path d="M 210 60 L 205 130 L 220 180 L 200 250 L 215 320"/>
+            <path d="M 175 200 L 200 220 L 240 230"/>
+            <path d="M 130 200 L 160 240 L 150 300"/>
+            <path d="M 300 180 L 285 240 L 305 300"/>
+          </g>
 
-        <line x1="40" y1="325" x2="360" y2="325"
-              stroke="#7FB8D9" stroke-width="1.2" opacity="0.5"
-              pointer-events="none"/>
+          <g stroke="#1B2A41" stroke-width="1" opacity="0.45" pointer-events="none">
+            <line x1="120" y1="270" x2="118" y2="322"/>
+            <line x1="150" y1="280" x2="148" y2="324"/>
+            <line x1="185" y1="285" x2="183" y2="326"/>
+            <line x1="225" y1="290" x2="223" y2="325"/>
+            <line x1="260" y1="290" x2="258" y2="323"/>
+            <line x1="295" y1="285" x2="293" y2="320"/>
+          </g>
 
-        <g fill="#FFFFFF" opacity="0.9" pointer-events="none">
-          <circle cx="180" cy="140" r="1.2"/>
-          <circle cx="205" cy="170" r="1"/>
-          <circle cx="230" cy="200" r="1.1"/>
-          <circle cx="160" cy="230" r="1"/>
-          <circle cx="280" cy="220" r="1.2"/>
-          <circle cx="310" cy="260" r="1"/>
-        </g>
-      </svg>
-    </div>
+          <line x1="40" y1="325" x2="360" y2="325"
+                stroke="#7FB8D9" stroke-width="1.2" opacity="0.5"
+                pointer-events="none"/>
 
-    <div class="cubes-layer" id="cubesLayer"></div>
+          <g fill="#FFFFFF" opacity="0.9" pointer-events="none">
+            <circle cx="180" cy="140" r="1.2"/>
+            <circle cx="205" cy="170" r="1"/>
+            <circle cx="230" cy="200" r="1.1"/>
+            <circle cx="160" cy="230" r="1"/>
+            <circle cx="280" cy="220" r="1.2"/>
+            <circle cx="310" cy="260" r="1"/>
+          </g>
+        </svg>
+      </div>
 
-    <div class="hintbar">
-      <span class="hint-text">Кликните по айсбергу, чтобы добыть лёд</span>
-    </div>
-  </main>
+      <div class="cubes-layer" id="cubesLayer"></div>
+
+      <div class="hintbar">
+        <span class="hint-text">Кликните по айсбергу, чтобы добыть лёд</span>
+      </div>
+    </section>
+
+    <!-- ЭКРАН: УЛУЧШЕНИЯ -->
+    <section class="screen" id="screen-upgrades">
+      <div class="screen__header">
+        <h2 class="screen__title">Улучшения</h2>
+      </div>
+
+      <div class="tabs" role="tablist">
+        <button class="tab tab--active" data-tab-target="click" type="button" role="tab">
+          За клик
+        </button>
+        <button class="tab" data-tab-target="passive" type="button" role="tab">
+          В секунду
+        </button>
+      </div>
+
+      <div class="upgrades-list" id="upgradesList"></div>
+    </section>
+
+    <!-- ЭКРАН: ЗАРАБОТОК -->
+    <section class="screen" id="screen-earn">
+      <div class="screen__header">
+        <h2 class="screen__title">Заработок</h2>
+      </div>
+
+      <div class="empty-state">
+        <div class="empty-state__icon">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"
+               stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+            <circle cx="12" cy="12" r="9"/>
+            <path d="M12 7v10"/>
+            <path d="M14.5 9.5c0-1-1.1-1.5-2.5-1.5s-2.5.5-2.5 1.5 1.1 1.5 2.5 1.5 2.5.5 2.5 1.5-1.1 1.5-2.5 1.5-2.5-.5-2.5-1.5"/>
+          </svg>
+        </div>
+        <div class="empty-state__title">Скоро здесь появится</div>
+        <div class="empty-state__text">
+          Оффлайн-добыча, бонус за вход и задания
+        </div>
+      </div>
+    </section>
+
+    <!-- ЭКРАН: ПРОФИЛЬ -->
+    <section class="screen" id="screen-profile">
+      <div class="screen__header">
+        <h2 class="screen__title">Профиль</h2>
+      </div>
+
+      <div class="profile-stats">
+        <div class="stat-card">
+          <div class="stat-card__label">Всего добыто льда</div>
+          <div class="stat-card__value" id="statTotalEarned">0</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-card__label">Ударов по айсбергу</div>
+          <div class="stat-card__value" id="statClicks">0</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-card__label">Текущий баланс</div>
+          <div class="stat-card__value" id="statBalance">0</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-card__label">Доход в секунду</div>
+          <div class="stat-card__value" id="statRate">0</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-card__label">Добыча за клик</div>
+          <div class="stat-card__value" id="statClickBonus">1</div>
+        </div>
+
+        <div class="reset-block">
+          <button class="reset-btn" type="button" id="resetStartBtn">
+            Сбросить прогресс
+          </button>
+        </div>
+      </div>
+    </section>
+
+  </div>
 
   <!-- НИЖНЕЕ МЕНЮ -->
   <nav class="bottomnav" id="bottomnav">
@@ -169,78 +250,6 @@
       <span class="nav-label">Профиль</span>
     </button>
   </nav>
-
-  <!-- МОДАЛКА: УЛУЧШЕНИЯ -->
-  <div class="modal" id="upgradesModal" aria-hidden="true">
-    <div class="modal__backdrop" data-close></div>
-    <div class="modal__sheet" role="dialog" aria-label="Улучшения">
-      <div class="modal__header">
-        <h2 class="modal__title">Улучшения</h2>
-        <button class="modal__close" type="button" data-close aria-label="Закрыть">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"
-               stroke-width="2" stroke-linecap="round" aria-hidden="true">
-            <path d="M6 6L18 18M18 6L6 18"/>
-          </svg>
-        </button>
-      </div>
-
-      <div class="tabs" role="tablist">
-        <button class="tab tab--active" data-tab-target="click" type="button" role="tab">
-          За клик
-        </button>
-        <button class="tab" data-tab-target="passive" type="button" role="tab">
-          В секунду
-        </button>
-      </div>
-
-      <div class="upgrades-list" id="upgradesList"></div>
-    </div>
-  </div>
-
-  <!-- МОДАЛКА: ПРОФИЛЬ -->
-  <div class="modal" id="profileModal" aria-hidden="true">
-    <div class="modal__backdrop" data-close></div>
-    <div class="modal__sheet" role="dialog" aria-label="Профиль">
-      <div class="modal__header">
-        <h2 class="modal__title">Профиль</h2>
-        <button class="modal__close" type="button" data-close aria-label="Закрыть">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"
-               stroke-width="2" stroke-linecap="round" aria-hidden="true">
-            <path d="M6 6L18 18M18 6L6 18"/>
-          </svg>
-        </button>
-      </div>
-
-      <div class="profile-stats">
-        <div class="stat-card">
-          <div class="stat-card__label">Всего добыто льда</div>
-          <div class="stat-card__value" id="statTotalEarned">0</div>
-        </div>
-        <div class="stat-card">
-          <div class="stat-card__label">Ударов по айсбергу</div>
-          <div class="stat-card__value" id="statClicks">0</div>
-        </div>
-        <div class="stat-card">
-          <div class="stat-card__label">Текущий баланс</div>
-          <div class="stat-card__value" id="statBalance">0</div>
-        </div>
-        <div class="stat-card">
-          <div class="stat-card__label">Доход в секунду</div>
-          <div class="stat-card__value" id="statRate">0</div>
-        </div>
-        <div class="stat-card">
-          <div class="stat-card__label">Добыча за клик</div>
-          <div class="stat-card__value" id="statClickBonus">1</div>
-        </div>
-
-        <div class="reset-block">
-          <button class="reset-btn" type="button" id="resetStartBtn">
-            Сбросить прогресс
-          </button>
-        </div>
-      </div>
-    </div>
-  </div>
 
   <!-- МОДАЛКА: ПОДТВЕРЖДЕНИЕ СБРОСА -->
   <div class="modal modal--center" id="confirmModal" aria-hidden="true">
