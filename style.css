@@ -27,128 +27,126 @@ html, body {
   user-select: none;
 }
 
-/* ================= ВЕРХ: счёт ================= */
-.topbar {
+/* ================= ШАПКА ПРОФИЛЯ ================= */
+.header {
   position: relative;
   z-index: 5;
-  padding: calc(env(safe-area-inset-top, 0px) + 24px) 16px 8px;
-  text-align: center;
-  transition: opacity 0.2s ease;
-}
-
-/* Скрытие верхней панели (для «Профиля») */
-.topbar.hidden {
-  display: none;
-}
-
-/* Компактный режим (для «Улучшений») — убираем строку «+X / сек» */
-.topbar.compact .balance-rate {
-  display: none;
-}
-
-.balance-block { display: inline-block; }
-
-.balance-label {
-  font-size: 13px;
-  letter-spacing: 0.18em;
-  text-transform: uppercase;
-  color: var(--gold-2);
-  opacity: 0.85;
-  margin-bottom: 6px;
-  text-align: center;
-}
-
-.balance-row {
+  padding: calc(env(safe-area-inset-top, 0px) + 16px) 16px 10px;
   display: flex;
-  flex-direction: row;
+  align-items: center;
+  gap: 12px;
+}
+
+.header__avatar {
+  width: 44px;
+  height: 44px;
+  flex-shrink: 0;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #1B2A41 0%, #243B55 100%);
+  border: 1px solid var(--gold);
+  display: flex;
   align-items: center;
   justify-content: center;
-  gap: 10px;
+  overflow: hidden;
+  box-shadow: 0 0 12px rgba(201,162,39,0.25);
+}
+.header__avatar svg {
+  width: 70%;
+  height: 70%;
+  color: var(--cream);
 }
 
-.balance-value {
-  font-size: 40px;
+.header__info {
+  flex: 1;
+  min-width: 0;
+}
+
+.header__name {
+  font-size: 16px;
   font-weight: 800;
   color: var(--cream);
-  letter-spacing: -0.02em;
-  line-height: 1;
+  line-height: 1.1;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
-.balance-value.pulse {
+.header__username {
+  font-size: 12px;
+  color: var(--muted);
+  margin-top: 2px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* Пилюли справа: счёт и скорость */
+.header__stats {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  flex-shrink: 0;
+}
+
+.stat-pill {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  background: var(--card-2);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 4px 8px;
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--cream);
+  line-height: 1;
+  min-width: 80px;
+  justify-content: flex-end;
+}
+
+.stat-pill__icon {
+  width: 14px;
+  height: 14px;
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.stat-pill__icon svg { width: 100%; height: 100%; display: block; }
+
+.stat-pill--balance .stat-pill__icon { color: #BFE3F5; }
+.stat-pill--rate    .stat-pill__icon { color: var(--green); }
+
+.stat-pill__value {
+  font-variant-numeric: tabular-nums;
+}
+
+.stat-pill__value.pulse {
   animation: pulse 0.3s ease;
 }
 @keyframes pulse {
   0%   { transform: scale(1);    color: var(--cream); }
-  50%  { transform: scale(1.12); color: var(--gold-2); }
+  50%  { transform: scale(1.15); color: var(--gold-2); }
   100% { transform: scale(1);    color: var(--cream); }
 }
 
-.balance-icon {
-  display: inline-block;
-  width: 32px;
-  height: 32px;
-  flex-shrink: 0;
-  filter: drop-shadow(0 0 8px rgba(191,227,245,0.55));
-}
-.balance-icon svg { width: 100%; height: 100%; display: block; }
-
-.balance-rate {
-  font-size: 13px;
-  color: var(--green);
-  margin-top: 4px;
-  letter-spacing: 0.02em;
-}
-
-/* ================= КОНТЕЙНЕР ЭКРАНОВ ================= */
-.screens {
+/* ================= КОНТЕЙНЕР СТРАНИЦЫ ================= */
+.page {
   position: relative;
-  height: calc(100vh - 140px - var(--nav-height));
-  overflow: hidden;
-}
-
-/* Когда верхняя панель скрыта (Профиль) — экран занимает больше места */
-.screens.full {
-  height: calc(100vh - var(--nav-height));
-}
-
-.screen {
-  position: absolute;
-  inset: 0;
-  padding: 8px 16px 16px;
-  display: flex;
-  flex-direction: column;
-  opacity: 0;
-  transform: translateX(40px);
-  pointer-events: none;
-  transition: opacity 0.28s ease, transform 0.28s cubic-bezier(0.2, 0.8, 0.2, 1);
+  height: calc(100vh - 90px - var(--nav-height));
+  padding: 4px 16px 16px;
   overflow-y: auto;
   -webkit-overflow-scrolling: touch;
 }
 
-.screen--active {
-  opacity: 1;
-  transform: translateX(0);
-  pointer-events: auto;
-}
-
-/* Заголовок экрана */
-.screen__header {
-  padding: 8px 0 16px;
-  text-align: center;
-}
-
-.screen__title {
-  font-size: 22px;
-  font-weight: 700;
-  color: var(--cream);
-  letter-spacing: 0.01em;
-}
-
 /* ================= ЭКРАН: ЗАРАБОТОК ================= */
-#screen-earn {
+.page--earn {
+  display: flex;
+  flex-direction: column;
   align-items: center;
   justify-content: center;
   gap: 14px;
+  overflow: hidden;
 }
 
 .iceberg-wrap {
@@ -176,7 +174,7 @@ html, body {
   100% { transform: translateY(0); }
 }
 
-/* ================= Трещина ================= */
+/* Трещина */
 .crack {
   position: fixed;
   width: 24px; height: 24px;
@@ -203,7 +201,7 @@ html, body {
   100% { opacity: 0; transform: translate(-50%,-50%) scale(1.4); }
 }
 
-/* ================= Летящий кубик ================= */
+/* Летящий кубик */
 .cubes-layer {
   position: fixed; inset: 0;
   pointer-events: none;
@@ -244,7 +242,6 @@ html, body {
   }
 }
 
-/* ================= ПОДСКАЗКА ================= */
 .hintbar {
   text-align: center;
   pointer-events: none;
@@ -256,14 +253,14 @@ html, body {
   letter-spacing: 0.02em;
 }
 
-/* ================= ТАБЫ ================= */
+/* ================= ЭКРАН: УЛУЧШЕНИЯ ================= */
 .tabs {
   display: flex;
   background: var(--card-2);
   border-radius: 12px;
   padding: 4px;
   margin-bottom: 14px;
-  margin-top: 8px;
+  margin-top: 4px;
 }
 
 .tab {
@@ -286,7 +283,6 @@ html, body {
   box-shadow: 0 0 0 1px var(--border);
 }
 
-/* ================= УЛУЧШЕНИЯ ================= */
 .upgrades-list {
   display: flex;
   flex-direction: column;
@@ -318,10 +314,7 @@ html, body {
   font-size: 14px;
 }
 
-.upgrade-card__info {
-  flex: 1;
-  min-width: 0;
-}
+.upgrade-card__info { flex: 1; min-width: 0; }
 
 .upgrade-card__name {
   font-size: 14px;
@@ -342,9 +335,7 @@ html, body {
   opacity: 0.85;
 }
 
-.upgrade-card__action {
-  flex-shrink: 0;
-}
+.upgrade-card__action { flex-shrink: 0; }
 
 .buy-btn {
   display: flex;
@@ -378,7 +369,11 @@ html, body {
   font-weight: 600;
 }
 
-/* ================= ПРОФИЛЬ ================= */
+/* ================= ЭКРАН: ПРОФИЛЬ ================= */
+.page--profile {
+  padding-top: 8px;
+}
+
 .profile-stats {
   display: flex;
   flex-direction: column;
@@ -410,10 +405,7 @@ html, body {
   letter-spacing: -0.01em;
 }
 
-/* ================= КНОПКА СБРОСА ================= */
-.reset-block {
-  margin-top: 6px;
-}
+.reset-block { margin-top: 6px; }
 
 .reset-btn {
   width: 100%;
@@ -466,6 +458,7 @@ html, body {
   cursor: pointer;
   padding: 6px 4px;
   border-radius: 12px;
+  text-decoration: none;
   transition: color 0.15s ease, background 0.15s ease;
   -webkit-tap-highlight-color: transparent;
 }
@@ -543,7 +536,6 @@ html, body {
   font-weight: 700;
   color: var(--cream);
   text-align: center;
-  letter-spacing: 0.01em;
 }
 
 .confirm__text {
@@ -566,7 +558,6 @@ html, body {
   font-family: inherit;
   font-size: 14px;
   font-weight: 600;
-  letter-spacing: 0.01em;
   cursor: pointer;
   transition: background 0.15s ease, color 0.15s ease, border-color 0.15s ease;
   -webkit-tap-highlight-color: transparent;
