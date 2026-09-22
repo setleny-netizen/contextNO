@@ -8,8 +8,8 @@
 </head>
 <body>
 
-  <!-- ВЕРХ: счёт (виден на всех экранах) -->
-  <header class="topbar">
+  <!-- ВЕРХ: счёт (виден на «Заработке» и «Улучшениях») -->
+  <header class="topbar" id="topbar">
     <div class="balance-block">
       <div class="balance-label">Ваш счёт</div>
       <div class="balance-row">
@@ -45,8 +45,8 @@
   <!-- ЭКРАНЫ -->
   <div class="screens" id="screens">
 
-    <!-- ЭКРАН: ИГРА -->
-    <section class="screen screen--active" id="screen-game">
+    <!-- ЭКРАН: ЗАРАБОТОК (главный) -->
+    <section class="screen screen--active" id="screen-earn">
       <div class="iceberg-wrap" id="icebergWrap">
         <svg class="iceberg-svg" id="icebergSvg" viewBox="0 0 400 420"
              xmlns="http://www.w3.org/2000/svg" aria-label="Айсберг">
@@ -137,10 +137,6 @@
 
     <!-- ЭКРАН: УЛУЧШЕНИЯ -->
     <section class="screen" id="screen-upgrades">
-      <div class="screen__header">
-        <h2 class="screen__title">Улучшения</h2>
-      </div>
-
       <div class="tabs" role="tablist">
         <button class="tab tab--active" data-tab-target="click" type="button" role="tab">
           За клик
@@ -151,28 +147,6 @@
       </div>
 
       <div class="upgrades-list" id="upgradesList"></div>
-    </section>
-
-    <!-- ЭКРАН: ЗАРАБОТОК -->
-    <section class="screen" id="screen-earn">
-      <div class="screen__header">
-        <h2 class="screen__title">Заработок</h2>
-      </div>
-
-      <div class="empty-state">
-        <div class="empty-state__icon">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"
-               stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
-            <circle cx="12" cy="12" r="9"/>
-            <path d="M12 7v10"/>
-            <path d="M14.5 9.5c0-1-1.1-1.5-2.5-1.5s-2.5.5-2.5 1.5 1.1 1.5 2.5 1.5 2.5.5 2.5 1.5-1.1 1.5-2.5 1.5-2.5-.5-2.5-1.5"/>
-          </svg>
-        </div>
-        <div class="empty-state__title">Скоро здесь появится</div>
-        <div class="empty-state__text">
-          Оффлайн-добыча, бонус за вход и задания
-        </div>
-      </div>
     </section>
 
     <!-- ЭКРАН: ПРОФИЛЬ -->
@@ -227,7 +201,7 @@
       <span class="nav-label">Улучшения</span>
     </button>
 
-    <button class="nav-btn" data-tab="earn" type="button">
+    <button class="nav-btn active" data-tab="earn" type="button">
       <span class="nav-icon">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"
              stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
@@ -252,7 +226,7 @@
   </nav>
 
   <!-- МОДАЛКА: ПОДТВЕРЖДЕНИЕ СБРОСА -->
-  <div class="modal modal--center" id="confirmModal" aria-hidden="true">
+  <div class="modal" id="confirmModal" aria-hidden="true">
     <div class="modal__backdrop" data-close></div>
     <div class="confirm" role="dialog" aria-label="Подтверждение сброса">
       <div class="confirm__title">Сбросить прогресс?</div>
