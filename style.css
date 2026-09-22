@@ -27,10 +27,10 @@ html, body {
   user-select: none;
 }
 
-/* ================= ВЕРХ ================= */
+/* ================= ВЕРХ: счёт ================= */
 .topbar {
   position: relative;
-  z-index: 2;
+  z-index: 5;
   padding: calc(env(safe-area-inset-top, 0px) + 24px) 16px 8px;
   text-align: center;
 }
@@ -88,13 +88,48 @@ html, body {
   letter-spacing: 0.02em;
 }
 
-/* ================= ЦЕНТР ================= */
-.stage {
+/* ================= КОНТЕЙНЕР ЭКРАНОВ ================= */
+.screens {
   position: relative;
-  z-index: 1;
-  height: calc(100vh - 240px - var(--nav-height));
+  height: calc(100vh - 140px - var(--nav-height));
+  overflow: hidden;
+}
+
+.screen {
+  position: absolute;
+  inset: 0;
+  padding: 8px 16px 16px;
   display: flex;
   flex-direction: column;
+  opacity: 0;
+  transform: translateX(40px);
+  pointer-events: none;
+  transition: opacity 0.28s ease, transform 0.28s cubic-bezier(0.2, 0.8, 0.2, 1);
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+}
+
+.screen--active {
+  opacity: 1;
+  transform: translateX(0);
+  pointer-events: auto;
+}
+
+/* Заголовок экрана */
+.screen__header {
+  padding: 8px 0 16px;
+  text-align: center;
+}
+
+.screen__title {
+  font-size: 22px;
+  font-weight: 700;
+  color: var(--cream);
+  letter-spacing: 0.01em;
+}
+
+/* ================= ЭКРАН: ИГРА ================= */
+#screen-game {
   align-items: center;
   justify-content: center;
   gap: 14px;
@@ -205,135 +240,6 @@ html, body {
   letter-spacing: 0.02em;
 }
 
-/* ================= НИЖНЕЕ МЕНЮ ================= */
-.bottomnav {
-  position: fixed;
-  left: 0; right: 0; bottom: 0;
-  height: calc(var(--nav-height) + env(safe-area-inset-bottom, 0px));
-  padding: 8px 8px calc(env(safe-area-inset-bottom, 0px) + 8px);
-  background: var(--card);
-  border-top: 1px solid var(--border);
-  display: flex;
-  align-items: stretch;
-  justify-content: space-around;
-  z-index: 10;
-}
-
-.nav-btn {
-  flex: 1;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  gap: 4px;
-  background: transparent;
-  border: none;
-  color: var(--muted);
-  font-family: inherit;
-  font-size: 11px;
-  letter-spacing: 0.02em;
-  cursor: pointer;
-  padding: 6px 4px;
-  border-radius: 12px;
-  transition: color 0.15s ease, background 0.15s ease;
-  -webkit-tap-highlight-color: transparent;
-}
-
-.nav-btn:hover { color: var(--cream); }
-.nav-btn.active { color: var(--gold-2); }
-
-.nav-btn.active .nav-icon {
-  filter: drop-shadow(0 0 8px rgba(212,175,55,0.45));
-}
-
-.nav-icon {
-  width: 26px;
-  height: 26px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  transition: filter 0.15s ease;
-}
-.nav-icon svg { width: 100%; height: 100%; }
-
-.nav-label {
-  font-size: 11px;
-  line-height: 1;
-}
-
-/* ================= МОДАЛКА (шторка снизу) ================= */
-.modal {
-  position: fixed;
-  inset: 0;
-  z-index: 100;
-  display: flex;
-  align-items: flex-end;
-  justify-content: center;
-  opacity: 0;
-  pointer-events: none;
-  transition: opacity 0.2s ease;
-}
-.modal.open {
-  opacity: 1;
-  pointer-events: auto;
-}
-
-.modal__backdrop {
-  position: absolute;
-  inset: 0;
-  background: rgba(0,0,0,0.6);
-  backdrop-filter: blur(2px);
-}
-
-.modal__sheet {
-  position: relative;
-  width: 100%;
-  max-width: 480px;
-  max-height: 85vh;
-  background: var(--card);
-  border-top-left-radius: 20px;
-  border-top-right-radius: 20px;
-  border-top: 1px solid var(--border);
-  padding: 20px 16px calc(env(safe-area-inset-bottom, 0px) + 20px);
-  display: flex;
-  flex-direction: column;
-  transform: translateY(100%);
-  transition: transform 0.3s cubic-bezier(0.2, 0.8, 0.2, 1);
-}
-.modal.open .modal__sheet {
-  transform: translateY(0);
-}
-
-.modal__header {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  margin-bottom: 16px;
-}
-
-.modal__title {
-  font-size: 20px;
-  font-weight: 700;
-  color: var(--cream);
-  letter-spacing: 0.02em;
-}
-
-.modal__close {
-  width: 32px;
-  height: 32px;
-  border-radius: 50%;
-  background: transparent;
-  border: 1px solid var(--border);
-  color: var(--muted);
-  cursor: pointer;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  transition: color 0.15s ease, border-color 0.15s ease;
-}
-.modal__close:hover { color: var(--cream); border-color: var(--gold-2); }
-.modal__close svg { width: 16px; height: 16px; }
-
 /* ================= ТАБЫ ================= */
 .tabs {
   display: flex;
@@ -365,12 +271,10 @@ html, body {
 
 /* ================= УЛУЧШЕНИЯ ================= */
 .upgrades-list {
-  overflow-y: auto;
   display: flex;
   flex-direction: column;
   gap: 10px;
-  padding-right: 4px;
-  -webkit-overflow-scrolling: touch;
+  padding-bottom: 8px;
 }
 
 .upgrade-card {
@@ -457,13 +361,46 @@ html, body {
   font-weight: 600;
 }
 
+/* ================= ЗАРАБОТОК (пустое состояние) ================= */
+.empty-state {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  padding: 40px 20px;
+  gap: 12px;
+}
+
+.empty-state__icon {
+  width: 64px;
+  height: 64px;
+  color: var(--gold-2);
+  opacity: 0.5;
+  margin-bottom: 8px;
+}
+.empty-state__icon svg { width: 100%; height: 100%; }
+
+.empty-state__title {
+  font-size: 16px;
+  font-weight: 700;
+  color: var(--cream);
+}
+
+.empty-state__text {
+  font-size: 13px;
+  color: var(--muted);
+  max-width: 260px;
+  line-height: 1.5;
+}
+
 /* ================= ПРОФИЛЬ ================= */
 .profile-stats {
   display: flex;
   flex-direction: column;
   gap: 10px;
-  overflow-y: auto;
-  -webkit-overflow-scrolling: touch;
+  padding-bottom: 8px;
 }
 
 .stat-card {
@@ -516,10 +453,85 @@ html, body {
   color: #FCA5A5;
 }
 
-/* ================= МОДАЛКА ПОДТВЕРЖДЕНИЯ (по центру) ================= */
-.modal--center {
+/* ================= НИЖНЕЕ МЕНЮ ================= */
+.bottomnav {
+  position: fixed;
+  left: 0; right: 0; bottom: 0;
+  height: calc(var(--nav-height) + env(safe-area-inset-bottom, 0px));
+  padding: 8px 8px calc(env(safe-area-inset-bottom, 0px) + 8px);
+  background: var(--card);
+  border-top: 1px solid var(--border);
+  display: flex;
+  align-items: stretch;
+  justify-content: space-around;
+  z-index: 10;
+}
+
+.nav-btn {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
   align-items: center;
+  justify-content: center;
+  gap: 4px;
+  background: transparent;
+  border: none;
+  color: var(--muted);
+  font-family: inherit;
+  font-size: 11px;
+  letter-spacing: 0.02em;
+  cursor: pointer;
+  padding: 6px 4px;
+  border-radius: 12px;
+  transition: color 0.15s ease, background 0.15s ease;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.nav-btn:hover { color: var(--cream); }
+.nav-btn.active { color: var(--gold-2); }
+
+.nav-btn.active .nav-icon {
+  filter: drop-shadow(0 0 8px rgba(212,175,55,0.45));
+}
+
+.nav-icon {
+  width: 26px;
+  height: 26px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: filter 0.15s ease;
+}
+.nav-icon svg { width: 100%; height: 100%; }
+
+.nav-label {
+  font-size: 11px;
+  line-height: 1;
+}
+
+/* ================= МОДАЛКА ПОДТВЕРЖДЕНИЯ ================= */
+.modal {
+  position: fixed;
+  inset: 0;
+  z-index: 100;
+  display: flex;
+  align-items: center;
+  justify-content: center;
   padding: 20px;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.2s ease;
+}
+.modal.open {
+  opacity: 1;
+  pointer-events: auto;
+}
+
+.modal__backdrop {
+  position: absolute;
+  inset: 0;
+  background: rgba(0,0,0,0.6);
+  backdrop-filter: blur(2px);
 }
 
 .confirm {
@@ -538,7 +550,7 @@ html, body {
   transition: transform 0.2s cubic-bezier(0.2, 0.8, 0.2, 1), opacity 0.2s ease;
   box-shadow: 0 20px 60px rgba(0,0,0,0.6);
 }
-.modal--center.open .confirm {
+.modal.open .confirm {
   transform: scale(1);
   opacity: 1;
 }
