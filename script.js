@@ -1,5 +1,5 @@
 // ============================================================
-// ЛОХМАТЫЙ КЛУБ — логика (страницы + localStorage)
+// ЛОХМАТЫЙ КЛУБ — логика (три экрана + localStorage)
 // ============================================================
 
 const STORAGE_KEY = 'lohmaty_club_state_v1';
@@ -55,6 +55,8 @@ const PASSIVE_UPGRADES = [
 ];
 
 // ---------- DOM ----------
+const topbar        = document.getElementById('topbar');
+const screensBox    = document.getElementById('screens');
 const balanceEl     = document.getElementById('balance');
 const balanceRateEl = document.getElementById('balanceRate');
 const wrap          = document.getElementById('icebergWrap');
@@ -66,7 +68,7 @@ const tabs          = document.querySelectorAll('.tab');
 const screens       = document.querySelectorAll('.screen');
 
 let activeUpgradeTab = 'click';
-let currentScreen    = 'game';   // 'game' | 'upgrades' | 'earn' | 'profile'
+let currentScreen    = 'earn';
 
 // ---------- Форматирование ----------
 function formatNumber(n) {
@@ -108,25 +110,35 @@ function updateProfileUI() {
 
 // ---------- Переключение экранов ----------
 function switchScreen(name) {
-  // name = 'game' | 'upgrades' | 'earn' | 'profile'
   currentScreen = name;
 
-  // Снимаем активность со всех экранов, ставим нужный
+  // Экраны
   screens.forEach((s) => s.classList.remove('screen--active'));
   document.getElementById(`screen-${name}`)?.classList.add('screen--active');
 
-  // Подсветка нижнего меню
+  // Нижнее меню
   navButtons.forEach((btn) => {
-    if (btn.dataset.tab === name) {
-      btn.classList.add('active');
-    } else {
-      btn.classList.remove('active');
-    }
+    if (btn.dataset.tab === name) btn.classList.add('active');
+    else btn.classList.remove('active');
   });
 
-  // При переходе на конкретный экран — обновляем его данные
-  if (name === 'upgrades') renderUpgrades();
-  if (name === 'profile')  updateProfileUI();
+  // Верхняя панель
+  if (name === 'profile') {
+    topbar.classList.add('hidden');
+    topbar.classList.remove('compact');
+    screensBox.classList.add('full');
+  } else if (name === 'upgrades') {
+    topbar.classList.remove('hidden');
+    topbar.classList.add('compact');
+    screensBox.classList.remove('full');
+    renderUpgrades();
+  } else { // earn
+    topbar.classList.remove('hidden');
+    topbar.classList.remove('compact');
+    screensBox.classList.remove('full');
+  }
+
+  if (name === 'profile') updateProfileUI();
 }
 
 // ---------- Клик по айсбергу ----------
@@ -274,15 +286,7 @@ upgradesList.addEventListener('click', (e) => {
 // ---------- Нижнее меню ----------
 navButtons.forEach((btn) => {
   btn.addEventListener('click', () => {
-    const tab = btn.dataset.tab;
-
-    // Если тапнули по уже активной вкладке — возвращаемся на Игру
-    if (currentScreen === tab) {
-      switchScreen('game');
-      return;
-    }
-
-    switchScreen(tab);
+    switchScreen(btn.dataset.tab);
   });
 });
 
@@ -300,7 +304,6 @@ function closeModal(modal) {
   modal.setAttribute('aria-hidden', 'true');
 }
 
-// Закрытие по backdrop или кнопкам с data-close
 confirmModal.addEventListener('click', (e) => {
   if (e.target.closest('[data-close]')) closeModal(confirmModal);
 });
@@ -320,10 +323,10 @@ resetConfirmBtn.addEventListener('click', () => {
   updateProfileUI();
   closeModal(confirmModal);
 
-  // Возвращаемся на главный экран
-  switchScreen('game');
+  // Возвращаемся на «Заработок»
+  switchScreen('earn');
 });
 
 // ---------- Инициализация ----------
 updateBalanceUI();
-switchScreen('game');
+switchScreen('earn');
