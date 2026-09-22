@@ -1,10 +1,10 @@
 // ============================================================
-// ЛОХМАТЫЙ КЛУБ — игровая логика (прототип, localStorage)
+// ЛОХМАТЫЙ КЛУБ — логика (страницы + localStorage)
 // ============================================================
 
 const STORAGE_KEY = 'lohmaty_club_state_v1';
 
-// ---------- Состояние по умолчанию ----------
+// ---------- Состояние ----------
 function defaultState() {
   return {
     balance: 0,
@@ -15,7 +15,6 @@ function defaultState() {
   };
 }
 
-// ---------- Загрузка / сохранение ----------
 function loadState() {
   try {
     const raw = localStorage.getItem(STORAGE_KEY);
@@ -61,21 +60,20 @@ const balanceRateEl = document.getElementById('balanceRate');
 const wrap          = document.getElementById('icebergWrap');
 const svg           = document.getElementById('icebergSvg');
 const layer         = document.getElementById('cubesLayer');
-const upgradesModal = document.getElementById('upgradesModal');
-const profileModal  = document.getElementById('profileModal');
-const confirmModal  = document.getElementById('confirmModal');
 const upgradesList  = document.getElementById('upgradesList');
 const navButtons    = document.querySelectorAll('.nav-btn');
 const tabs          = document.querySelectorAll('.tab');
+const screens       = document.querySelectorAll('.screen');
 
 let activeUpgradeTab = 'click';
+let currentScreen    = 'game';   // 'game' | 'upgrades' | 'earn' | 'profile'
 
 // ---------- Форматирование ----------
 function formatNumber(n) {
   return Math.floor(n).toLocaleString('ru-RU');
 }
 
-// ---------- Расчёт бонусов ----------
+// ---------- Бонусы ----------
 function getClickBonus() {
   return 1 + CLICK_UPGRADES.reduce((sum, u) => {
     const lvl = state.clickLevels[u.id] || 0;
@@ -94,7 +92,7 @@ function getUpgradePrice(upgrade, level) {
   return Math.floor(upgrade.basePrice * Math.pow(1.15, level));
 }
 
-// ---------- Обновление UI ----------
+// ---------- UI ----------
 function updateBalanceUI() {
   balanceEl.textContent = formatNumber(state.balance);
   balanceRateEl.textContent = `+${formatNumber(getPassiveBonus())} / сек`;
@@ -106,6 +104,29 @@ function updateProfileUI() {
   document.getElementById('statBalance').textContent     = formatNumber(state.balance);
   document.getElementById('statRate').textContent        = formatNumber(getPassiveBonus());
   document.getElementById('statClickBonus').textContent  = formatNumber(getClickBonus());
+}
+
+// ---------- Переключение экранов ----------
+function switchScreen(name) {
+  // name = 'game' | 'upgrades' | 'earn' | 'profile'
+  currentScreen = name;
+
+  // Снимаем активность со всех экранов, ставим нужный
+  screens.forEach((s) => s.classList.remove('screen--active'));
+  document.getElementById(`screen-${name}`)?.classList.add('screen--active');
+
+  // Подсветка нижнего меню
+  navButtons.forEach((btn) => {
+    if (btn.dataset.tab === name) {
+      btn.classList.add('active');
+    } else {
+      btn.classList.remove('active');
+    }
+  });
+
+  // При переходе на конкретный экран — обновляем его данные
+  if (name === 'upgrades') renderUpgrades();
+  if (name === 'profile')  updateProfileUI();
 }
 
 // ---------- Клик по айсбергу ----------
@@ -182,23 +203,6 @@ setInterval(() => {
   }
 }, 1000);
 
-// ---------- Модалки ----------
-function openModal(modal) {
-  modal.classList.add('open');
-  modal.setAttribute('aria-hidden', 'false');
-}
-function closeModal(modal) {
-  modal.classList.remove('open');
-  modal.setAttribute('aria-hidden', 'true');
-}
-
-// Универсальное закрытие по backdrop или крестику
-document.querySelectorAll('.modal').forEach((m) => {
-  m.addEventListener('click', (e) => {
-    if (e.target.closest('[data-close]')) closeModal(m);
-  });
-});
-
 // ---------- Табы улучшений ----------
 tabs.forEach((tab) => {
   tab.addEventListener('click', () => {
@@ -267,16 +271,44 @@ upgradesList.addEventListener('click', (e) => {
   renderUpgrades();
 });
 
-// ---------- Сброс прогресса ----------
+// ---------- Нижнее меню ----------
+navButtons.forEach((btn) => {
+  btn.addEventListener('click', () => {
+    const tab = btn.dataset.tab;
+
+    // Если тапнули по уже активной вкладке — возвращаемся на Игру
+    if (currentScreen === tab) {
+      switchScreen('game');
+      return;
+    }
+
+    switchScreen(tab);
+  });
+});
+
+// ---------- Модалка подтверждения сброса ----------
+const confirmModal    = document.getElementById('confirmModal');
 const resetStartBtn   = document.getElementById('resetStartBtn');
 const resetConfirmBtn = document.getElementById('resetConfirmBtn');
 
-// Открыть окно подтверждения
+function openModal(modal) {
+  modal.classList.add('open');
+  modal.setAttribute('aria-hidden', 'false');
+}
+function closeModal(modal) {
+  modal.classList.remove('open');
+  modal.setAttribute('aria-hidden', 'true');
+}
+
+// Закрытие по backdrop или кнопкам с data-close
+confirmModal.addEventListener('click', (e) => {
+  if (e.target.closest('[data-close]')) closeModal(confirmModal);
+});
+
 resetStartBtn.addEventListener('click', () => {
   openModal(confirmModal);
 });
 
-// Подтвердить сброс
 resetConfirmBtn.addEventListener('click', () => {
   const fresh = defaultState();
   Object.keys(state).forEach((k) => delete state[k]);
@@ -287,30 +319,11 @@ resetConfirmBtn.addEventListener('click', () => {
   updateBalanceUI();
   updateProfileUI();
   closeModal(confirmModal);
-  closeModal(profileModal);
+
+  // Возвращаемся на главный экран
+  switchScreen('game');
 });
-
-// ---------- Нижнее меню ----------
-navButtons.forEach((navBtn) => {
-  navBtn.addEventListener('click', () => {
-    navButtons.forEach((b) => b.classList.remove('active'));
-    navBtn.classList.add('active');
-
-    const tab = navBtn.dataset.tab;
-    if (tab === 'upgrades') {
-      renderUpgrades();
-      openModal(upgradesModal);
-    } else if (tab === 'profile') {
-      updateProfileUI();
-      openModal(profileModal);
-    } else {
-      console.log('Открыть вкладку:', tab);
-    }
-  });
-});
-
-// По умолчанию активна «Заработок»
-document.querySelector('.nav-btn[data-tab="earn"]')?.classList.add('active');
 
 // ---------- Инициализация ----------
 updateBalanceUI();
+switchScreen('game');
