@@ -1,150 +1,148 @@
 <svg width="500" height="600" viewBox="0 0 500 600" xmlns="http://www.w3.org/2000/svg">
   <defs>
-    <!-- Градиенты для скафандра -->
-    <linearGradient id="suitGrad" x1="0%" y1="0%" x2="100%" y2="100%">
-      <stop offset="0%" stop-color="#ffffff" />
-      <stop offset="100%" stop-color="#cbd5e1" />
+    <!-- Неоновые градиенты -->
+    <linearGradient id="neonPink" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#ff007f" />
+      <stop offset="100%" stop-color="#ff00ff" />
     </linearGradient>
-    <linearGradient id="visorGrad" x1="0%" y1="0%" x2="100%" y2="100%">
-      <stop offset="0%" stop-color="#0f172a" />
-      <stop offset="50%" stop-color="#1e293b" />
-      <stop offset="100%" stop-color="#334155" />
-    </linearGradient>
-    <linearGradient id="visorReflect" x1="0%" y1="0%" x2="100%" y2="100%">
-      <stop offset="0%" stop-color="#38bdf8" stop-opacity="0.8" />
-      <stop offset="100%" stop-color="#38bdf8" stop-opacity="0" />
+    <linearGradient id="neonCyan" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#00ffff" />
+      <stop offset="100%" stop-color="#0088ff" />
     </linearGradient>
     
-    <!-- Тени -->
-    <filter id="shadow" x="-20%" y="-20%" width="140%" height="140%">
-      <feDropShadow dx="0" dy="10" stdDeviation="8" flood-color="#0f172a" flood-opacity="0.3" />
+    <!-- Градиент для шерсти -->
+    <linearGradient id="furDark" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#2a2a35" />
+      <stop offset="100%" stop-color="#111118" />
+    </linearGradient>
+    <linearGradient id="furLight" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#3d3d4a" />
+      <stop offset="100%" stop-color="#1a1a24" />
+    </linearGradient>
+
+    <!-- Свечение -->
+    <filter id="glowPink" x="-50%" y="-50%" width="200%" height="200%">
+      <feGaussianBlur stdDeviation="6" result="blur" />
+      <feComposite in="SourceGraphic" in2="blur" operator="over" />
     </filter>
-    <filter id="softShadow" x="-10%" y="-10%" width="120%" height="120%">
-      <feDropShadow dx="0" dy="4" stdDeviation="4" flood-color="#0f172a" flood-opacity="0.2" />
+    <filter id="glowCyan" x="-50%" y="-50%" width="200%" height="200%">
+      <feGaussianBlur stdDeviation="4" result="blur" />
+      <feComposite in="SourceGraphic" in2="blur" operator="over" />
+    </filter>
+    
+    <!-- Тени -->
+    <filter id="dropShadow" x="-20%" y="-20%" width="140%" height="140%">
+      <feDropShadow dx="0" dy="10" stdDeviation="10" flood-color="#000" flood-opacity="0.8" />
     </filter>
   </defs>
 
-  <!-- Стили для интерактивности (анимация при наведении) -->
+  <!-- Анимации при наведении -->
   <style>
-    .arm-left { transition: transform 0.4s cubic-bezier(0.34, 1.56, 0.64, 1); transform-origin: 170px 320px; }
-    .arm-left:hover { transform: rotate(-30deg); }
+    .tail { transition: transform 0.5s ease-in-out; transform-origin: 200px 420px; }
+    .tail:hover { transform: rotate(-20deg); }
     
-    .arm-right { transition: transform 0.4s cubic-bezier(0.34, 1.56, 0.64, 1); transform-origin: 330px 320px; }
-    .arm-right:hover { transform: rotate(30deg); }
+    .ear-left { transition: transform 0.3s ease; transform-origin: 170px 180px; }
+    .ear-left:hover { transform: rotate(-15deg); }
     
-    .helmet { transition: transform 0.4s ease; transform-origin: 250px 200px; }
-    .helmet:hover { transform: translateY(-10px) rotate(5deg); }
+    .ear-right { transition: transform 0.3s ease; transform-origin: 330px 180px; }
+    .ear-right:hover { transform: rotate(15deg); }
     
-    .leg-left { transition: transform 0.4s ease; transform-origin: 210px 450px; }
-    .leg-left:hover { transform: rotate(15deg); }
+    .cyber-eye { transition: opacity 0.3s ease; }
+    .cyber-eye:hover { opacity: 0.5; }
     
-    .leg-right { transition: transform 0.4s ease; transform-origin: 290px 450px; }
-    .leg-right:hover { transform: rotate(-15deg); }
+    .hud { animation: pulse 2s infinite; }
+    @keyframes pulse {
+      0% { opacity: 0.7; }
+      50% { opacity: 1; }
+      100% { opacity: 0.7; }
+    }
   </style>
 
-  <!-- Фон (космос) -->
-  <rect width="500" height="600" fill="#1e1b4b" rx="20" />
+  <!-- Фон (Ночной город) -->
+  <rect width="500" height="600" fill="#0b0c10" rx="20" />
   
-  <!-- Звезды -->
-  <circle cx="80" cy="100" r="2" fill="#fff" opacity="0.8"/>
-  <circle cx="420" cy="80" r="3" fill="#fff" opacity="0.6"/>
-  <circle cx="350" cy="150" r="1.5" fill="#fff" opacity="0.9"/>
-  <circle cx="120" cy="300" r="2" fill="#fff" opacity="0.5"/>
-  <circle cx="400" cy="400" r="2.5" fill="#fff" opacity="0.7"/>
-  <circle cx="50" cy="500" r="1" fill="#fff" opacity="0.4"/>
-  <circle cx="450" cy="250" r="1.5" fill="#fff" opacity="0.8"/>
+  <!-- Сетка на фоне -->
+  <path d="M 0 100 L 500 100 M 0 200 L 500 200 M 0 300 L 500 300 M 0 400 L 500 400 M 0 500 L 500 500" stroke="#1f2833" stroke-width="1" opacity="0.5" />
+  <path d="M 100 0 L 100 600 M 200 0 L 200 600 M 300 0 L 300 600 M 400 0 L 400 600" stroke="#1f2833" stroke-width="1" opacity="0.5" />
 
-  <!-- Планета на фоне -->
-  <circle cx="400" cy="100" r="40" fill="#f59e0b" opacity="0.8" />
-  <ellipse cx="400" cy="100" rx="60" ry="10" fill="none" stroke="#fcd34d" stroke-width="4" transform="rotate(-20 400 100)" opacity="0.6" />
+  <!-- Неоновые вывески на фоне -->
+  <rect x="30" y="250" width="20" height="150" fill="url(#neonPink)" filter="url(#glowPink)" opacity="0.4" />
+  <rect x="450" y="150" width="15" height="200" fill="url(#neonCyan)" filter="url(#glowCyan)" opacity="0.4" />
 
   <!-- Тень на полу -->
-  <ellipse cx="250" cy="540" rx="100" ry="15" fill="#0f172a" opacity="0.4" />
+  <ellipse cx="250" cy="520" rx="120" ry="20" fill="#000" opacity="0.6" filter="url(#dropShadow)" />
 
   <!-- ================= ПЕРСОНАЖ ================= -->
 
-  <!-- НОГИ -->
-  <g id="legs">
-    <!-- Левая нога -->
-    <g class="leg-left">
-      <rect x="185" y="420" width="50" height="90" rx="20" fill="url(#suitGrad)" filter="url(#shadow)" />
-      <rect x="175" y="500" width="70" height="30" rx="10" fill="#475569" filter="url(#softShadow)" />
-      <rect x="180" y="505" width="60" height="5" fill="#64748b" rx="2" />
-    </g>
-    <!-- Правая нога -->
-    <g class="leg-right">
-      <rect x="265" y="420" width="50" height="90" rx="20" fill="url(#suitGrad)" filter="url(#shadow)" />
-      <rect x="255" y="500" width="70" height="30" rx="10" fill="#475569" filter="url(#softShadow)" />
-      <rect x="260" y="505" width="60" height="5" fill="#64748b" rx="2" />
-    </g>
+  <!-- ХВОСТ -->
+  <g class="tail" filter="url(#dropShadow)">
+    <path d="M 200 430 Q 80 450 80 350 Q 80 250 150 200" fill="none" stroke="url(#furDark)" stroke-width="60" stroke-linecap="round" />
+    <!-- Неоновые полосы на хвосте -->
+    <path d="M 180 430 Q 120 440 120 380" fill="none" stroke="url(#neonPink)" stroke-width="8" filter="url(#glowPink)" />
+    <path d="M 100 330 Q 100 280 130 250" fill="none" stroke="url(#neonCyan)" stroke-width="6" filter="url(#glowCyan)" />
+    <!-- Кончик хвоста -->
+    <circle cx="150" cy="200" r="25" fill="url(#neonPink)" filter="url(#glowPink)" opacity="0.8" />
   </g>
 
-  <!-- ТЕЛО (Рюкзак и скафандр) -->
-  <g id="body" filter="url(#shadow)">
-    <!-- Рюкзак за спиной -->
-    <rect x="170" y="280" width="160" height="180" rx="30" fill="#94a3b8" />
-    <rect x="180" y="290" width="140" height="160" rx="20" fill="#64748b" />
-    <circle cx="250" cy="370" r="15" fill="#38bdf8" opacity="0.8" />
-    <circle cx="250" cy="370" r="8" fill="#0284c7" />
+  <!-- ТЕЛО -->
+  <g id="body" filter="url(#dropShadow)">
+    <!-- Основа тела -->
+    <path d="M 180 280 Q 250 260 320 280 L 330 480 Q 250 520 170 480 Z" fill="url(#furDark)" />
     
-    <!-- Основной корпус -->
-    <rect x="160" y="280" width="180" height="180" rx="40" fill="url(#suitGrad)" />
+    <!-- Грудка (светлая шерсть) -->
+    <path d="M 210 300 Q 250 280 290 300 L 280 450 Q 250 470 220 450 Z" fill="url(#furLight)" />
     
-    <!-- Грудная панель -->
-    <rect x="200" y="310" width="100" height="60" rx="10" fill="#e2e8f0" />
-    <rect x="210" y="320" width="80" height="40" rx="5" fill="#f8fafc" />
+    <!-- Кибер-имплант на груди -->
+    <rect x="230" y="330" width="40" height="20" rx="5" fill="#111" stroke="url(#neonCyan)" stroke-width="2" />
+    <circle cx="240" cy="340" r="4" fill="#00ffff" filter="url(#glowCyan)" class="hud" />
+    <circle cx="260" cy="340" r="4" fill="#ff007f" filter="url(#glowPink)" class="hud" />
     
-    <!-- Индикаторы на груди -->
-    <circle cx="220" cy="340" r="6" fill="#ef4444" />
-    <circle cx="240" cy="340" r="6" fill="#22c55e" />
-    <circle cx="260" cy="340" r="6" fill="#3b82f6" />
-    <rect x="215" y="355" width="70" height="4" fill="#cbd5e1" rx="2" />
-
-    <!-- Пояс -->
-    <rect x="155" y="420" width="190" height="25" rx="10" fill="#475569" />
-    <rect x="235" y="415" width="30" height="35" rx="5" fill="#fbbf24" />
+    <!-- Лапы (передние) -->
+    <rect x="200" y="480" width="40" height="50" rx="15" fill="url(#furDark)" />
+    <rect x="260" y="480" width="40" height="50" rx="15" fill="url(#furDark)" />
+    <!-- Когти (неон) -->
+    <line x1="205" y1="525" x2="205" y2="535" stroke="#00ffff" stroke-width="3" filter="url(#glowCyan)" stroke-linecap="round" />
+    <line x1="215" y1="525" x2="215" y2="535" stroke="#00ffff" stroke-width="3" filter="url(#glowCyan)" stroke-linecap="round" />
+    <line x1="265" y1="525" x2="265" y2="535" stroke="#ff007f" stroke-width="3" filter="url(#glowPink)" stroke-linecap="round" />
+    <line x1="275" y1="525" x2="275" y2="535" stroke="#ff007f" stroke-width="3" filter="url(#glowPink)" stroke-linecap="round" />
   </g>
 
-  <!-- РУКИ -->
-  <g id="arms" filter="url(#shadow)">
-    <!-- Левая рука (машет) -->
-    <g class="arm-left">
-      <path d="M 170 320 Q 100 320 100 240" fill="none" stroke="url(#suitGrad)" stroke-width="40" stroke-linecap="round" />
-      <circle cx="100" cy="240" r="25" fill="#94a3b8" />
-      <!-- Перчатка -->
-      <circle cx="100" cy="240" r="15" fill="#f8fafc" />
+  <!-- ГОЛОВА -->
+  <g id="head" filter="url(#dropShadow)">
+    <!-- Форма головы (геометричная) -->
+    <polygon points="170,200 250,150 330,200 300,300 200,300" fill="url(#furDark)" />
+    
+    <!-- Морда (светлая) -->
+    <polygon points="200,230 250,200 300,230 280,290 220,290" fill="url(#furLight)" />
+    
+    <!-- Уши -->
+    <g class="ear-left">
+      <polygon points="170,200 140,100 200,170" fill="url(#furDark)" />
+      <polygon points="170,200 155,130 190,180" fill="url(#neonPink)" filter="url(#glowPink)" opacity="0.6" />
+    </g>
+    <g class="ear-right">
+      <polygon points="330,200 360,100 300,170" fill="url(#furDark)" />
+      <polygon points="330,200 345,130 310,180" fill="url(#neonPink)" filter="url(#glowPink)" opacity="0.6" />
     </g>
 
-    <!-- Правая рука (опущена) -->
-    <g class="arm-right">
-      <path d="M 330 320 Q 400 320 400 380" fill="none" stroke="url(#suitGrad)" stroke-width="40" stroke-linecap="round" />
-      <circle cx="400" cy="380" r="25" fill="#94a3b8" />
-      <!-- Перчатка -->
-      <circle cx="400" cy="380" r="15" fill="#f8fafc" />
+    <!-- Глаза (Кибер-импланты) -->
+    <g class="cyber-eye">
+      <!-- Левый глаз -->
+      <polygon points="200,230 230,220 230,250 200,260" fill="#111" stroke="#00ffff" stroke-width="2" filter="url(#glowCyan)" />
+      <circle cx="215" cy="240" r="4" fill="#fff" />
+      <!-- Правый глаз (с прицелом) -->
+      <polygon points="270,220 300,230 300,260 270,250" fill="#111" stroke="#ff007f" stroke-width="2" filter="url(#glowPink)" />
+      <circle cx="285" cy="240" r="4" fill="#fff" />
+      <!-- Лазерный прицел -->
+      <line x1="285" y1="240" x2="380" y2="220" stroke="#ff007f" stroke-width="1" filter="url(#glowPink)" opacity="0.6" stroke-dasharray="4 2" />
     </g>
+
+    <!-- Нос -->
+    <polygon points="250,250 240,265 260,265" fill="#ff007f" filter="url(#glowPink)" />
+    
+    <!-- Кибер-визор (HUD) на лбу -->
+    <rect x="220" y="195" width="60" height="10" rx="3" fill="#111" stroke="#00ffff" stroke-width="1" />
+    <line x1="225" y1="200" x2="275" y2="200" stroke="#00ffff" stroke-width="2" filter="url(#glowCyan)" class="hud" />
   </g>
 
-  <!-- ШЛЕМ -->
-  <g id="helmet-group" class="helmet" filter="url(#shadow)">
-    <!-- Воротник -->
-    <rect x="190" y="250" width="120" height="30" rx="15" fill="#475569" />
-    
-    <!-- Купол шлема -->
-    <circle cx="250" cy="190" r="85" fill="url(#suitGrad)" />
-    
-    <!-- Забрало (Стекло) -->
-    <ellipse cx="250" cy="190" rx="65" ry="55" fill="url(#visorGrad)" />
-    
-    <!-- Блик на стекле (отражение космоса) -->
-    <path d="M 200 160 Q 240 130 280 160 Q 250 200 200 160 Z" fill="url(#visorReflect)" />
-    <circle cx="210" cy="170" r="5" fill="#fff" opacity="0.6" />
-    
-    <!-- Антенна -->
-    <line x1="250" y1="105" x2="250" y2="70" stroke="#94a3b8" stroke-width="4" stroke-linecap="round" />
-    <circle cx="250" cy="70" r="8" fill="#ef4444" />
-    <circle cx="250" cy="70" r="4" fill="#fca5a5" />
-  </g>
-
-  <!-- Мини-подсказка для пользователя -->
-  <text x="250" y="580" font-family="sans-serif" font-size="14" fill="#64748b" text-anchor="middle" opacity="0.8">Наведите на руки, ноги или шлем</text>
 </svg>
