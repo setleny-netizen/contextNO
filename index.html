@@ -63,20 +63,28 @@
     .header__name { font-size: 16px; font-weight: 800; color: var(--cream); line-height: 1.1; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
     .header__username { font-size: 12px; color: var(--muted); margin-top: 2px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 
-    .header__stats { display: flex; flex-direction: column; gap: 4px; flex-shrink: 0; }
+    .header__stats { 
+      display: flex; 
+      align-items: center; 
+      gap: 6px; 
+      flex-shrink: 0; 
+    }
 
     .stat-pill {
       display: flex; align-items: center; gap: 6px;
       background: var(--card-2); border: 1px solid var(--border);
-      border-radius: 10px; padding: 4px 8px;
+      border-radius: 10px; padding: 6px 10px;
       font-size: 12px; font-weight: 700; color: var(--cream);
-      line-height: 1; min-width: 80px; justify-content: flex-end;
+      line-height: 1; justify-content: flex-start;
+      height: 32px;
     }
 
     .stat-pill__icon { width: 14px; height: 14px; flex-shrink: 0; display: flex; align-items: center; justify-content: center; }
     .stat-pill__icon svg { width: 100%; height: 100%; display: block; }
-    .stat-pill--balance .stat-pill__icon { color: #BFE3F5; }
-    .stat-pill--rate    .stat-pill__icon { color: var(--green); }
+    
+    .stat-pill--click .stat-pill__icon { color: #FCA5A5; }
+    .stat-pill--passive .stat-pill__icon { color: #93C5FD; }
+
     .stat-pill__value { font-variant-numeric: tabular-nums; }
     .stat-pill__value.pulse { animation: pulse 0.3s ease; }
 
@@ -99,7 +107,6 @@
     .page.active { display: flex; flex-direction: column; }
 
     /* ================= ЭКРАН: ЗАРАБОТОК ================= */
-    /* П.1: Вернули по центру */
     .page--earn {
       align-items: center;
       justify-content: center;
@@ -136,13 +143,15 @@
       0%, 100% { transform: scaleY(1) translateY(0); }
       50%      { transform: scaleY(1.015) translateY(-2px); }
     }
-    .sword { transform-box: fill-box; transform-origin: 50% 85%; }
+    
+    .sword { transform-origin: 268px 134px; }
     .sword.swing { animation: swing 0.28s ease-out; }
     @keyframes swing {
       0%   { transform: rotate(0deg); }
       40%  { transform: rotate(-42deg); }
       100% { transform: rotate(0deg); }
     }
+
     .snowfall { animation: fall 5s linear infinite; }
     .snowfall.s2 { animation-delay: 1.2s; animation-duration: 6s; }
     .snowfall.s3 { animation-delay: 2.4s; animation-duration: 5.5s; }
@@ -192,7 +201,7 @@
       100% { opacity: 0; transform: translate(-50%, -140%) scale(0.8); }
     }
 
-    /* Летящий кубик */
+    /* Летящий кубик (общий) */
     .cubes-layer { position: fixed; inset: 0; pointer-events: none; z-index: 4; }
 
     .cube {
@@ -213,6 +222,23 @@
       100% { transform: translate(calc(-50% + var(--dx)), calc(-50% + var(--dy))) scale(0.3) rotate(360deg); opacity: 0; }
     }
 
+    /* Выпадающий лёд при смерти */
+    .loot-cube {
+      position: fixed; width: 18px; height: 18px;
+      border-radius: 3px;
+      background: linear-gradient(135deg, #EAF6FF 0%, #BFE3F5 40%, #7FB8D9 100%);
+      box-shadow: inset 1px 1px 2px rgba(255,255,255,0.9), inset -1px -1px 3px rgba(27,42,65,0.4), 0 0 8px rgba(191,227,245,0.6);
+      transform: translate(-50%, -50%);
+      pointer-events: none; z-index: 5;
+      animation: lootDrop 0.6s cubic-bezier(0.2, 0.8, 0.3, 1) forwards;
+    }
+    
+    @keyframes lootDrop {
+      0% { transform: translate(-50%, -50%) scale(1) rotate(0deg); opacity: 1; }
+      50% { transform: translate(calc(-50% + var(--lx) * 0.6), calc(-50% + var(--ly) * 0.6 - 30px)) scale(1.1) rotate(90deg); opacity: 1; }
+      100% { transform: translate(calc(-50% + var(--lx)), calc(-50% + var(--ly))) scale(0.8) rotate(180deg); opacity: 0.8; }
+    }
+
     /* Ледяные искры */
     .particle {
       position: fixed; width: 6px; height: 6px;
@@ -227,7 +253,7 @@
       100% { transform: translate(calc(-50% + cos(var(--angle)) * var(--distance)), calc(-50% + sin(var(--angle)) * var(--distance) + 30px)) scale(0.3); opacity: 0; }
     }
 
-    .hintbar { text-align: center; pointer-events: none; }
+    .hintbar { text-align: center; pointer-events: none; margin-top: -10px; }
     .hint-text { font-size: 13px; color: var(--muted); letter-spacing: 0.02em; }
 
     /* ================= ЭКРАН: УЛУЧШЕНИЯ ================= */
@@ -317,25 +343,40 @@
     </div>
 
     <div class="header__stats">
-      <div class="stat-pill stat-pill--balance">
+      <div class="stat-pill stat-pill--click" title="Урон от клика">
         <span class="stat-pill__icon">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round" aria-hidden="true">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M9 11V6a2 2 0 0 1 4 0v5"/>
+            <path d="M13 11V7a2 2 0 0 1 4 0v4"/>
+            <path d="M17 11V9a2 2 0 0 1 4 0v5a8 8 0 0 1-8 8H9a8 8 0 0 1-8-8v-3a2 2 0 0 1 4 0v2"/>
+            <path d="M5 11v2"/>
+          </svg>
+        </span>
+        <span class="stat-pill__value" id="clickTop">1</span>
+      </div>
+      
+      <div class="stat-pill stat-pill--passive" title="Урон в секунду">
+        <span class="stat-pill__icon">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M14.5 17.5L3 6V3h3l11.5 11.5"/>
+            <path d="M13 19l6-6"/>
+            <path d="M16 16l4 4"/>
+            <path d="M19 21l2-2"/>
+          </svg>
+        </span>
+        <span class="stat-pill__value" id="rateTop">+0</span>
+      </div>
+
+      <div class="stat-pill" style="min-width: 100px; justify-content: flex-end;">
+        <span class="stat-pill__value" id="balanceTop">0</span>
+        <span class="stat-pill__icon" style="color: #BFE3F5;">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round">
             <path d="M3 8l9-5 9 5-9 5-9-5z" fill="currentColor" fill-opacity="0.25"/>
             <path d="M3 8v8l9 5 9-5V8"/>
             <path d="M3 8l9 5 9-5"/>
             <path d="M12 13v8"/>
           </svg>
         </span>
-        <span class="stat-pill__value" id="balanceTop">0</span>
-      </div>
-
-      <div class="stat-pill stat-pill--rate">
-        <span class="stat-pill__icon">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-            <path d="M4 12h4l2-6 4 12 2-6h4"/>
-          </svg>
-        </span>
-        <span class="stat-pill__value" id="rateTop">+0</span>
       </div>
     </div>
   </header>
@@ -376,7 +417,6 @@
             <stop offset="100%" stop-color="#8FD3F2" stop-opacity="0"/>
           </radialGradient>
 
-          <!-- Бесконечный паттерн снега (снежинки на земле) -->
           <pattern id="snowPattern" x="0" y="0" width="80" height="120" patternUnits="userSpaceOnUse">
             <rect width="80" height="120" fill="#0A0A0A"/>
             <circle cx="10" cy="20"  r="2.5" fill="#FFFFFF" opacity="0.85"/>
@@ -386,14 +426,12 @@
             <circle cx="60" cy="15"  r="2.2" fill="#FFFFFF" opacity="0.8"/>
           </pattern>
 
-          <!-- Градиент сугроба -->
           <linearGradient id="driftGrad" x1="0" y1="0" x2="0" y2="1">
             <stop offset="0%"   stop-color="#FFFFFF"/>
             <stop offset="40%"  stop-color="#E4F1FA"/>
             <stop offset="100%" stop-color="#9FC4DF"/>
           </linearGradient>
 
-          <!-- Градиенты для HP-бара (П.2) -->
           <linearGradient id="hpFrameGrad" x1="0" y1="0" x2="0" y2="1">
             <stop offset="0%"   stop-color="#7A7E85"/>
             <stop offset="20%"  stop-color="#C3C8CF"/>
@@ -420,81 +458,35 @@
         <!-- Свечение -->
         <ellipse cx="200" cy="150" rx="185" ry="135" fill="url(#sGlow)" pointer-events="none"/>
 
-        <!-- ===== ЗЕМЛЯ: бесконечные сугробы по всему горизонту ===== -->
+        <!-- ===== ЗЕМЛЯ ===== -->
         <g id="snowGround" pointer-events="none">
           <rect x="-1400" y="252" width="3200" height="120" fill="#9FC4DF" opacity="0.55"/>
           <path d="
-            M -1400 252
-            Q -1350 232  -1300 246
-            Q -1250 258  -1200 244
-            Q -1150 228  -1100 246
-            Q -1050 260  -1000 244
-            Q  -950 228   -900 246
-            Q  -850 260   -800 244
-            Q  -750 228   -700 246
-            Q  -650 260   -600 244
-            Q  -550 228   -500 246
-            Q  -450 260   -400 244
-            Q  -350 228   -300 246
-            Q  -250 260   -200 244
-            Q  -150 228   -100 246
-            Q   -50 260      0 246
-            Q    50 228    100 246
-            Q   150 260    200 244
-            Q   250 228    300 246
-            Q   350 260    400 244
-            Q   450 228    500 246
-            Q   550 260    600 244
-            Q   650 228    700 246
-            Q   750 260    800 244
-            Q   850 228    900 246
-            Q   950 260   1000 244
-            Q  1050 228   1100 246
-            Q  1150 260   1200 244
-            Q  1250 228   1300 246
-            Q  1350 260   1400 244
-            Q  1450 228   1500 246
-            Q  1550 260   1600 244
-            Q  1650 228   1700 246
-            Q  1750 260   1800 244
-            L 1800 400
-            L -1400 400 Z
+            M -1400 252 Q -1350 232 -1300 246 Q -1250 258 -1200 244 Q -1150 228 -1100 246
+            Q -1050 260 -1000 244 Q  -950 228  -900 246 Q  -850 260  -800 244
+            Q  -750 228  -700 246 Q  -650 260  -600 244 Q  -550 228  -500 246
+            Q  -450 260  -400 244 Q  -350 228  -300 246 Q  -250 260  -200 244
+            Q  -150 228  -100 246 Q   -50 260     0 246 Q    50 228   100 246
+            Q   150 260   200 244 Q   250 228   300 246 Q   350 260   400 244
+            Q   450 228   500 246 Q   550 260   600 244 Q   650 228   700 246
+            Q   750 260   800 244 Q   850 228   900 246 Q   950 260  1000 244
+            Q  1050 228  1100 246 Q  1150 260  1200 244 Q  1250 228  1300 246
+            Q  1350 260  1400 244 Q  1450 228  1500 246 Q  1550 260  1600 244
+            Q  1650 228  1700 246 Q  1750 260  1800 244 L 1800 400 L -1400 400 Z
           " fill="url(#driftGrad)" opacity="0.97"/>
           <rect x="-1400" y="252" width="3200" height="50" fill="url(#snowPattern)" opacity="0.55"/>
           <path d="
-            M -1400 252
-            Q -1350 232  -1300 246
-            Q -1250 258  -1200 244
-            Q -1150 228  -1100 246
-            Q -1050 260  -1000 244
-            Q  -950 228   -900 246
-            Q  -850 260   -800 244
-            Q  -750 228   -700 246
-            Q  -650 260   -600 244
-            Q  -550 228   -500 246
-            Q  -450 260   -400 244
-            Q  -350 228   -300 246
-            Q  -250 260   -200 244
-            Q  -150 228   -100 246
-            Q   -50 260      0 246
-            Q    50 228    100 246
-            Q   150 260    200 244
-            Q   250 228    300 246
-            Q   350 260    400 244
-            Q   450 228    500 246
-            Q   550 260    600 244
-            Q   650 228    700 246
-            Q   750 260    800 244
-            Q   850 228    900 246
-            Q   950 260   1000 244
-            Q  1050 228   1100 246
-            Q  1150 260   1200 244
-            Q  1250 228   1300 246
-            Q  1350 260   1400 244
-            Q  1450 228   1500 246
-            Q  1550 260   1600 244
-            Q  1650 228   1700 246
-            Q  1750 260   1800 244
+            M -1400 252 Q -1350 232 -1300 246 Q -1250 258 -1200 244 Q -1150 228 -1100 246
+            Q -1050 260 -1000 244 Q  -950 228  -900 246 Q  -850 260  -800 244
+            Q  -750 228  -700 246 Q  -650 260  -600 244 Q  -550 228  -500 246
+            Q  -450 260  -400 244 Q  -350 228  -300 246 Q  -250 260  -200 244
+            Q  -150 228  -100 246 Q   -50 260     0 246 Q    50 228   100 246
+            Q   150 260   200 244 Q   250 228   300 246 Q   350 260   400 244
+            Q   450 228   500 246 Q   550 260   600 244 Q   650 228   700 246
+            Q   750 260   800 244 Q   850 228   900 246 Q   950 260  1000 244
+            Q  1050 228  1100 246 Q  1150 260  1200 244 Q  1250 228  1300 246
+            Q  1350 260  1400 244 Q  1450 228  1500 246 Q  1550 260  1600 244
+            Q  1650 228  1700 246 Q  1750 260  1800 244
           " stroke="#FFFFFF" stroke-opacity="0.85" stroke-width="2.5" fill="none"/>
         </g>
 
@@ -510,75 +502,223 @@
           </g>
 
           <g class="bob">
-            <path d="M165 118 Q108 190 124 246 Q200 230 276 246 Q292 190 235 118 Z" fill="url(#cape)"/>
-            <path d="M150 190 Q146 225 150 240 M250 190 Q254 225 250 240" stroke="#3E0A12" stroke-opacity="0.35" stroke-width="2" fill="none" stroke-linecap="round"/>
-
-            <circle cx="200" cy="212" r="52" fill="url(#snow)"/>
-            <circle cx="200" cy="145" r="40" fill="url(#snow)"/>
-            <circle cx="200" cy="88"  r="32" fill="url(#snow)"/>
-
-            <g fill="#2A2A2E">
-              <circle cx="200" cy="200" r="4"/>
-              <circle cx="200" cy="219" r="4"/>
-              <circle cx="200" cy="238" r="4"/>
-            </g>
-
-            <path d="M162 168 Q200 181 238 168" stroke="#5A3A22" stroke-width="8" fill="none" stroke-linecap="round"/>
-            <rect x="193" y="170" width="14" height="11" rx="2" fill="url(#gold)" stroke="#8A6A12" stroke-width="1"/>
-
-            <ellipse cx="200" cy="120" rx="30" ry="9" fill="url(#steelDark)" stroke="#2F3945" stroke-width="1.5"/>
-            <path d="M175 120 H225 M180 124 H220" stroke="#C5CED8" stroke-width="1" stroke-dasharray="2 2.5" opacity="0.7"/>
-
-            <path d="M165 142 Q150 146 140 154" stroke="#5B3A22" stroke-width="5" fill="none" stroke-linecap="round"/>
-            <g transform="rotate(-8 125 165)">
-              <path d="M98 128 L152 128 L152 168 Q152 196 125 210 Q98 196 98 168 Z" fill="url(#shieldBlue)" stroke="url(#steel)" stroke-width="4" stroke-linejoin="round"/>
-              <path d="M125 132 V204 M101 158 H149" stroke="url(#gold)" stroke-width="6" stroke-linecap="butt"/>
-              <circle cx="125" cy="158" r="7" fill="url(#gold)" stroke="#8A6A12" stroke-width="1"/>
-              <path d="M104 132 L104 160" stroke="#FFFFFF" stroke-opacity="0.35" stroke-width="3" stroke-linecap="round"/>
-            </g>
-
-            <path d="M237 140 Q252 136 264 130" stroke="#5B3A22" stroke-width="5" fill="none" stroke-linecap="round"/>
-            <g transform="rotate(14 268 132)">
-              <g class="sword" id="sword">
-                <polygon points="264,124 272,124 271,56 268,44 265,56" fill="url(#steel)" stroke="#4A5563" stroke-width="1" stroke-linejoin="round"/>
-                <path d="M268 54 V122" stroke="#FFFFFF" stroke-opacity="0.7" stroke-width="1.4"/>
-                <rect x="254" y="122" width="28" height="6" rx="2" fill="url(#gold)" stroke="#8A6A12" stroke-width="1"/>
-                <rect x="266" y="128" width="4" height="16" fill="#5B3A22"/>
-                <circle cx="268" cy="147" r="4" fill="url(#gold)" stroke="#8A6A12" stroke-width="1"/>
-                <circle cx="268" cy="134" r="4.5" fill="#5B3A22"/>
+            
+            <!-- ========================================== -->
+            <!-- ВАРИАНТ 1: РЫЦАРЬ                          -->
+            <!-- ========================================== -->
+            <g id="class-knight">
+              <!-- Плащ (СЗАДИ) -->
+              <path d="M165 118 Q108 190 124 246 Q200 230 276 246 Q292 190 235 118 Z" fill="url(#cape)"/>
+              <path d="M150 190 Q146 225 150 240 M250 190 Q254 225 250 240" stroke="#3E0A12" stroke-opacity="0.35" stroke-width="2" fill="none" stroke-linecap="round"/>
+              
+              <!-- Руки -->
+              <path d="M165 142 Q150 146 140 154" stroke="#5B3A22" stroke-width="5" fill="none" stroke-linecap="round"/>
+              <path d="M237 140 Q252 136 264 130" stroke="#5B3A22" stroke-width="5" fill="none" stroke-linecap="round"/>
+              
+              <!-- Тело -->
+              <circle cx="200" cy="212" r="52" fill="url(#snow)"/>
+              <circle cx="200" cy="145" r="40" fill="url(#snow)"/>
+              <circle cx="200" cy="88"  r="32" fill="url(#snow)"/>
+              
+              <!-- Детали тела -->
+              <g fill="#2A2A2E">
+                <circle cx="200" cy="200" r="4"/>
+                <circle cx="200" cy="219" r="4"/>
+                <circle cx="200" cy="238" r="4"/>
               </g>
-            </g>
+              <path d="M162 168 Q200 181 238 168" stroke="#5A3A22" stroke-width="8" fill="none" stroke-linecap="round"/>
+              <rect x="193" y="170" width="14" height="11" rx="2" fill="url(#gold)" stroke="#8A6A12" stroke-width="1"/>
+              <ellipse cx="200" cy="120" rx="30" ry="9" fill="url(#steelDark)" stroke="#2F3945" stroke-width="1.5"/>
+              <path d="M175 120 H225 M180 124 H220" stroke="#C5CED8" stroke-width="1" stroke-dasharray="2 2.5" opacity="0.7"/>
 
-            <g>
-              <ellipse cx="180" cy="106" rx="6" ry="3.5" fill="#F4A8A8" opacity="0.5"/>
-              <ellipse cx="220" cy="106" rx="6" ry="3.5" fill="#F4A8A8" opacity="0.5"/>
-              <circle cx="187" cy="99" r="4.2" fill="#1E1E22"/>
-              <circle cx="213" cy="99" r="4.2" fill="#1E1E22"/>
-              <circle cx="188.3" cy="97.7" r="1.2" fill="#FFFFFF"/>
-              <circle cx="214.3" cy="97.7" r="1.2" fill="#FFFFFF"/>
-              <path d="M195 103 L205 103 L200 118 Z" fill="#F08A24" stroke="#B85E10" stroke-width="1" stroke-linejoin="round"/>
-              <g fill="#1E1E22">
-                <circle cx="184" cy="112" r="1.7"/>
-                <circle cx="190" cy="115.5" r="1.7"/>
-                <circle cx="210" cy="115.5" r="1.7"/>
-                <circle cx="216" cy="112" r="1.7"/>
+              <!-- Голова (лицо) -->
+              <g>
+                <ellipse cx="180" cy="106" rx="6" ry="3.5" fill="#F4A8A8" opacity="0.5"/>
+                <ellipse cx="220" cy="106" rx="6" ry="3.5" fill="#F4A8A8" opacity="0.5"/>
+                <circle cx="187" cy="99" r="4.2" fill="#1E1E22"/>
+                <circle cx="213" cy="99" r="4.2" fill="#1E1E22"/>
+                <circle cx="188.3" cy="97.7" r="1.2" fill="#FFFFFF"/>
+                <circle cx="214.3" cy="97.7" r="1.2" fill="#FFFFFF"/>
+                <path d="M195 103 L205 103 L200 118 Z" fill="#F08A24" stroke="#B85E10" stroke-width="1" stroke-linejoin="round"/>
+                <g fill="#1E1E22">
+                  <circle cx="184" cy="112" r="1.7"/>
+                  <circle cx="190" cy="115.5" r="1.7"/>
+                  <circle cx="210" cy="115.5" r="1.7"/>
+                  <circle cx="216" cy="112" r="1.7"/>
+                </g>
               </g>
+
+              <!-- Оружие -->
+              <g transform="rotate(-8 125 165)">
+                <path d="M98 128 L152 128 L152 168 Q152 196 125 210 Q98 196 98 168 Z" fill="url(#shieldBlue)" stroke="url(#steel)" stroke-width="4" stroke-linejoin="round"/>
+                <path d="M125 132 V204 M101 158 H149" stroke="url(#gold)" stroke-width="6" stroke-linecap="butt"/>
+                <circle cx="125" cy="158" r="7" fill="url(#gold)" stroke="#8A6A12" stroke-width="1"/>
+                <path d="M104 132 L104 160" stroke="#FFFFFF" stroke-opacity="0.35" stroke-width="3" stroke-linecap="round"/>
+              </g>
+              <g transform="rotate(14 268 132)">
+                <g class="sword" id="sword-knight">
+                  <polygon points="264,124 272,124 271,56 268,44 265,56" fill="url(#steel)" stroke="#4A5563" stroke-width="1" stroke-linejoin="round"/>
+                  <path d="M268 54 V122" stroke="#FFFFFF" stroke-opacity="0.7" stroke-width="1.4"/>
+                  <rect x="254" y="122" width="28" height="6" rx="2" fill="url(#gold)" stroke="#8A6A12" stroke-width="1"/>
+                  <rect x="266" y="128" width="4" height="16" fill="#5B3A22"/>
+                  <circle cx="268" cy="147" r="4" fill="url(#gold)" stroke="#8A6A12" stroke-width="1"/>
+                  <circle cx="268" cy="134" r="4.5" fill="#5B3A22"/>
+                </g>
+              </g>
+
+              <!-- Шлем -->
+              <path d="M164 86 Q164 38 200 36 Q236 38 236 86 Z" fill="url(#steel)" stroke="#4A5563" stroke-width="1.5" stroke-linejoin="round"/>
+              <path d="M200 38 V86" stroke="#FFFFFF" stroke-opacity="0.6" stroke-width="1.5"/>
+              <path d="M176 52 Q180 44 190 41" stroke="#FFFFFF" stroke-opacity="0.8" stroke-width="3" fill="none" stroke-linecap="round"/>
+              <ellipse cx="200" cy="86" rx="43" ry="9" fill="url(#steelDark)" stroke="#2F3945" stroke-width="1.5"/>
+              <ellipse cx="200" cy="84" rx="43" ry="8" fill="none" stroke="url(#gold)" stroke-width="2.5"/>
+              <g fill="url(#gold)">
+                <circle cx="170" cy="88" r="1.8"/>
+                <circle cx="185" cy="92" r="1.8"/>
+                <circle cx="200" cy="93.5" r="1.8"/>
+                <circle cx="215" cy="92" r="1.8"/>
+                <circle cx="230" cy="88" r="1.8"/>
+              </g>
+              <path d="M196 40 Q186 12 214 8 Q238 6 246 24 Q228 18 220 32 Q214 20 205 38 Z" fill="url(#cape)" stroke="#5A0F1A" stroke-width="1" stroke-linejoin="round"/>
             </g>
 
-            <path d="M164 86 Q164 38 200 36 Q236 38 236 86 Z" fill="url(#steel)" stroke="#4A5563" stroke-width="1.5" stroke-linejoin="round"/>
-            <path d="M200 38 V86" stroke="#FFFFFF" stroke-opacity="0.6" stroke-width="1.5"/>
-            <path d="M176 52 Q180 44 190 41" stroke="#FFFFFF" stroke-opacity="0.8" stroke-width="3" fill="none" stroke-linecap="round"/>
-            <ellipse cx="200" cy="86" rx="43" ry="9" fill="url(#steelDark)" stroke="#2F3945" stroke-width="1.5"/>
-            <ellipse cx="200" cy="84" rx="43" ry="8" fill="none" stroke="url(#gold)" stroke-width="2.5"/>
-            <g fill="url(#gold)">
-              <circle cx="170" cy="88" r="1.8"/>
-              <circle cx="185" cy="92" r="1.8"/>
-              <circle cx="200" cy="93.5" r="1.8"/>
-              <circle cx="215" cy="92" r="1.8"/>
-              <circle cx="230" cy="88" r="1.8"/>
-            </g>
-            <path d="M196 40 Q186 12 214 8 Q238 6 246 24 Q228 18 220 32 Q214 20 205 38 Z" fill="url(#cape)" stroke="#5A0F1A" stroke-width="1" stroke-linejoin="round"/>
+            <!-- ========================================== -->
+            <!-- ВАРИАНТ 2: ЛУЧНИК                          -->
+            <!-- ========================================== -->
+            <g id="class-archer" style="display: none;">
+              <!-- Плащ/Накидка (СЗАДИ) -->
+              <path d="M165 118 Q108 190 124 246 Q200 230 276 246 Q292 190 235 118 Z" fill="#2F5E3A"/>
+              <path d="M150 190 Q146 225 150 240 M250 190 Q254 225 250 240" stroke="#1A3B22" stroke-opacity="0.5" stroke-width="2" fill="none" stroke-linecap="round"/>
+              
+              <!-- Колчан за спиной -->
+              <path d="M240 130 L255 180" stroke="#5B3A22" stroke-width="8" stroke-linecap="round"/>
+              <path d="M245 125 L238 90 M250 130 L243 95 M255 135 L248 100" stroke="#C9A227" stroke-width="2.5" stroke-linecap="round"/>
+              <path d="M235 85 L240 90 L243 85 Z" fill="#C9A227"/>
+              <path d="M240 90 L245 95 L248 90 Z" fill="#C9A227"/>
+              <path d="M245 95 L250 100 L253 95 Z" fill="#C9A227"/>
 
+              <!-- Руки -->
+              <path d="M165 142 Q150 146 140 154" stroke="#5B3A22" stroke-width="5" fill="none" stroke-linecap="round"/>
+              <path d="M237 140 Q252 136 264 130" stroke="#5B3A22" stroke-width="5" fill="none" stroke-linecap="round"/>
+              
+              <!-- Тело -->
+              <circle cx="200" cy="212" r="52" fill="url(#snow)"/>
+              <circle cx="200" cy="145" r="40" fill="url(#snow)"/>
+              <circle cx="200" cy="88"  r="32" fill="url(#snow)"/>
+              
+              <!-- Детали тела -->
+              <g fill="#2A2A2E">
+                <circle cx="200" cy="200" r="4"/>
+                <circle cx="200" cy="219" r="4"/>
+                <circle cx="200" cy="238" r="4"/>
+              </g>
+              <path d="M162 168 Q200 181 238 168" stroke="#5A3A22" stroke-width="8" fill="none" stroke-linecap="round"/>
+              <rect x="193" y="170" width="14" height="11" rx="2" fill="#C9A227" stroke="#8A6A12" stroke-width="1"/>
+              <ellipse cx="200" cy="120" rx="30" ry="9" fill="#1A3B22" stroke="#0A1A0F" stroke-width="1.5"/>
+              <path d="M175 120 H225 M180 124 H220" stroke="#4ADE80" stroke-width="1" stroke-dasharray="2 2.5" opacity="0.5"/>
+
+              <!-- Голова (лицо) -->
+              <g>
+                <ellipse cx="180" cy="106" rx="6" ry="3.5" fill="#F4A8A8" opacity="0.5"/>
+                <ellipse cx="220" cy="106" rx="6" ry="3.5" fill="#F4A8A8" opacity="0.5"/>
+                <circle cx="187" cy="99" r="4.2" fill="#1E1E22"/>
+                <circle cx="213" cy="99" r="4.2" fill="#1E1E22"/>
+                <circle cx="188.3" cy="97.7" r="1.2" fill="#FFFFFF"/>
+                <circle cx="214.3" cy="97.7" r="1.2" fill="#FFFFFF"/>
+                <path d="M195 103 L205 103 L200 118 Z" fill="#F08A24" stroke="#B85E10" stroke-width="1" stroke-linejoin="round"/>
+                <g fill="#1E1E22">
+                  <circle cx="184" cy="112" r="1.7"/>
+                  <circle cx="190" cy="115.5" r="1.7"/>
+                  <circle cx="210" cy="115.5" r="1.7"/>
+                  <circle cx="216" cy="112" r="1.7"/>
+                </g>
+              </g>
+
+              <!-- Оружие: Лук -->
+              <path d="M125 110 Q90 150 125 200" fill="none" stroke="#5B3A22" stroke-width="5"/>
+              <path d="M125 110 Q90 150 125 200" fill="none" stroke="#C9A227" stroke-width="1.5" stroke-dasharray="4 3"/>
+              <path d="M140 154 L125 155" stroke="#8E9AA8" stroke-width="3"/>
+              <path d="M135 150 L145 155 L135 160 Z" fill="#C9A227"/>
+
+              <!-- Шлем (Капюшон) -->
+              <path d="M164 86 Q164 30 200 30 Q236 30 236 86 Z" fill="#2F5E3A" stroke="#1A3B22" stroke-width="2"/>
+              <path d="M200 30 V86" stroke="#1A3B22" stroke-width="1.5"/>
+              <path d="M185 45 Q200 35 215 45" stroke="#1A3B22" stroke-width="1.5" fill="none"/>
+              <!-- Перья/Листья -->
+              <path d="M200 30 Q205 10 215 5 Q210 20 205 30" fill="#C9A227"/>
+              <path d="M200 30 Q195 10 185 5 Q190 20 195 30" fill="#C9A227"/>
+            </g>
+
+            <!-- ========================================== -->
+            <!-- ВАРИАНТ 3: МАГ                            -->
+            <!-- ========================================== -->
+            <g id="class-mage" style="display: none;">
+              <!-- Мантия (СЗАДИ) -->
+              <path d="M165 118 Q108 190 124 246 Q200 230 276 246 Q292 190 235 118 Z" fill="#5E2F8A"/>
+              <path d="M150 190 Q146 225 150 240 M250 190 Q254 225 250 240" stroke="#321A4A" stroke-opacity="0.5" stroke-width="2" fill="none" stroke-linecap="round"/>
+              
+              <!-- Звезды на мантии -->
+              <path d="M160 200 L162 205 L167 205 L163 208 L165 213 L160 210 L155 213 L157 208 L153 205 L158 205 Z" fill="#F5DC7E"/>
+              <path d="M240 220 L241 223 L244 223 L242 225 L243 228 L240 226 L237 228 L238 225 L236 223 L239 223 Z" fill="#F5DC7E"/>
+
+              <!-- Руки -->
+              <path d="M165 142 Q150 146 140 154" stroke="#5B3A22" stroke-width="5" fill="none" stroke-linecap="round"/>
+              <path d="M237 140 Q252 136 264 130" stroke="#5B3A22" stroke-width="5" fill="none" stroke-linecap="round"/>
+              
+              <!-- Тело -->
+              <circle cx="200" cy="212" r="52" fill="url(#snow)"/>
+              <circle cx="200" cy="145" r="40" fill="url(#snow)"/>
+              <circle cx="200" cy="88"  r="32" fill="url(#snow)"/>
+              
+              <!-- Детали тела -->
+              <g fill="#2A2A2E">
+                <circle cx="200" cy="200" r="4"/>
+                <circle cx="200" cy="219" r="4"/>
+                <circle cx="200" cy="238" r="4"/>
+              </g>
+              <path d="M162 168 Q200 181 238 168" stroke="#321A4A" stroke-width="8" fill="none" stroke-linecap="round"/>
+              <rect x="193" y="170" width="14" height="11" rx="2" fill="#F5DC7E" stroke="#8A6A12" stroke-width="1"/>
+              <ellipse cx="200" cy="120" rx="30" ry="9" fill="#321A4A" stroke="#1A0A2A" stroke-width="1.5"/>
+              <path d="M175 120 H225 M180 124 H220" stroke="#8FD3F2" stroke-width="1" stroke-dasharray="2 2.5" opacity="0.5"/>
+
+              <!-- Голова (лицо) -->
+              <g>
+                <ellipse cx="180" cy="106" rx="6" ry="3.5" fill="#F4A8A8" opacity="0.5"/>
+                <ellipse cx="220" cy="106" rx="6" ry="3.5" fill="#F4A8A8" opacity="0.5"/>
+                <circle cx="187" cy="99" r="4.2" fill="#1E1E22"/>
+                <circle cx="213" cy="99" r="4.2" fill="#1E1E22"/>
+                <circle cx="188.3" cy="97.7" r="1.2" fill="#FFFFFF"/>
+                <circle cx="214.3" cy="97.7" r="1.2" fill="#FFFFFF"/>
+                <path d="M195 103 L205 103 L200 118 Z" fill="#F08A24" stroke="#B85E10" stroke-width="1" stroke-linejoin="round"/>
+                <g fill="#1E1E22">
+                  <circle cx="184" cy="112" r="1.7"/>
+                  <circle cx="190" cy="115.5" r="1.7"/>
+                  <circle cx="210" cy="115.5" r="1.7"/>
+                  <circle cx="216" cy="112" r="1.7"/>
+                </g>
+              </g>
+
+              <!-- Оружие: Посох и Свиток -->
+              <path d="M125 100 L125 220" stroke="#5B3A22" stroke-width="5" stroke-linecap="round"/>
+              <circle cx="125" cy="90" r="12" fill="#8FD3F2" stroke="#3C74C4" stroke-width="2"/>
+              <circle cx="125" cy="90" r="5" fill="#FFFFFF"/>
+              <path d="M125 78 Q110 90 125 102 Q140 90 125 78 Z" fill="#EAF6FF" opacity="0.6"/>
+
+              <g transform="rotate(15 260 125)">
+                <rect x="250" y="110" width="20" height="30" rx="3" fill="#F2EFE6"/>
+                <path d="M255 120 L265 118 M255 125 L265 123 M255 130 L265 128" stroke="#5B3A22" stroke-width="1.5"/>
+                <circle cx="260" cy="112" r="3" fill="#C9A227"/>
+                <circle cx="260" cy="138" r="3" fill="#C9A227"/>
+              </g>
+
+              <!-- Шлем (Колпак) -->
+              <path d="M160 80 Q200 0 240 80 Z" fill="#5E2F8A" stroke="#321A4A" stroke-width="2"/>
+              <ellipse cx="200" cy="80" rx="45" ry="10" fill="#5E2F8A" stroke="#321A4A" stroke-width="2"/>
+              <path d="M180 60 L190 60 M195 40 L205 40" stroke="#F5DC7E" stroke-width="2" stroke-linecap="round"/>
+              <circle cx="200" cy="25" r="4" fill="#F5DC7E"/>
+            </g>
+
+            <!-- Искры блики -->
             <g fill="#FFFFFF" pointer-events="none">
               <path class="twinkle" d="M 150 70 l 2 6 l 6 2 l -6 2 l -2 6 l -2 -6 l -6 -2 l 6 -2 z"/>
               <path class="twinkle" style="animation-delay:1.1s" d="M 250 160 l 1.5 4.5 l 4.5 1.5 l -4.5 1.5 l -1.5 4.5 l -1.5 -4.5 l -4.5 -1.5 l 4.5 -1.5 z"/>
@@ -586,43 +726,34 @@
           </g>
         </g>
 
-        <!-- ===== СЛОЙ ДЛЯ РАЗВАЛИН ===== -->
         <g id="debrisLayer"></g>
 
-        <!-- ===== HP-БАР В СТИЛЕ КАРТИНКИ (П.2) ===== -->
-        <g id="hpBar" pointer-events="none" transform="translate(0, -30)">
-          <!-- Внешняя рамка-каркас -->
-          <rect x="80" y="0" width="240" height="32" rx="6" fill="#1A1A1A" stroke="#0A0A0A" stroke-width="2"/>
-          <!-- Внутренний тёмный фон -->
-          <rect x="88" y="4" width="224" height="24" rx="4" fill="url(#hpBgGrad)" />
-          <!-- Красная полоса здоровья -->
-          <rect id="hpFill" x="88" y="4" width="224" height="24" rx="4" fill="url(#hpRedGrad)"/>
-          <!-- Блик сверху на красной полосе -->
-          <rect x="88" y="5" width="224" height="6" rx="3" fill="#FFFFFF" opacity="0.2" />
-          <!-- Текст с обводкой -->
-          <text id="hpText" x="200" y="21" text-anchor="middle" font-size="16" font-weight="900" fill="#FFFFFF" font-family="system-ui, sans-serif" stroke="#000000" stroke-width="3" paint-order="stroke" letter-spacing="1">100</text>
+        <!-- HP-бар -->
+        <g id="hpBar" pointer-events="none" transform="translate(0, 338)">
+          <rect x="70" y="0" width="260" height="34" rx="6" fill="#1A1A1A" stroke="#0A0A0A" stroke-width="2"/>
+          <rect x="80" y="4" width="240" height="26" rx="4" fill="url(#hpBgGrad)" />
+          <rect id="hpFill" x="80" y="4" width="240" height="26" rx="4" fill="url(#hpRedGrad)"/>
+          <rect x="80" y="5" width="240" height="6" rx="3" fill="#FFFFFF" opacity="0.2" />
+          
+          <path d="M 74 0 C 64 -4, 54 4, 54 17 C 54 30, 64 38, 74 34 L 74 0 Z" fill="url(#hpCapGrad)" stroke="#1A1A1A" stroke-width="1.5"/>
+          <path d="M 68 4 C 62 2, 58 8, 58 17 C 58 26, 62 32, 68 30" fill="none" stroke="#FFFFFF" stroke-opacity="0.3" stroke-width="2"/>
+          <circle cx="66" cy="17" r="3" fill="#1A1A1A" />
+          <circle cx="66" cy="17" r="1.5" fill="#7A7E85" />
 
-          <!-- Левая крышка (болты и выступы) -->
-          <path d="M 84 0 C 74 -4, 64 4, 64 16 C 64 28, 74 36, 84 32 L 84 0 Z" fill="url(#hpCapGrad)" stroke="#1A1A1A" stroke-width="1.5"/>
-          <path d="M 78 4 C 72 2, 68 8, 68 16 C 68 24, 72 30, 78 28" fill="none" stroke="#FFFFFF" stroke-opacity="0.3" stroke-width="2"/>
-          <circle cx="76" cy="16" r="3" fill="#1A1A1A" />
-          <circle cx="76" cy="16" r="1.5" fill="#7A7E85" />
+          <path d="M 326 0 C 336 -4, 346 4, 346 17 C 346 30, 336 38, 326 34 L 326 0 Z" fill="url(#hpCapGrad)" stroke="#1A1A1A" stroke-width="1.5"/>
+          <path d="M 332 4 C 338 2, 342 8, 342 17 C 342 26, 338 32, 332 30" fill="none" stroke="#FFFFFF" stroke-opacity="0.3" stroke-width="2"/>
+          <circle cx="334" cy="17" r="3" fill="#1A1A1A" />
+          <circle cx="334" cy="17" r="1.5" fill="#7A7E85" />
 
-          <!-- Правая крышка (болты и выступы) -->
-          <path d="M 316 0 C 326 -4, 336 4, 336 16 C 336 28, 326 36, 316 32 L 316 0 Z" fill="url(#hpCapGrad)" stroke="#1A1A1A" stroke-width="1.5"/>
-          <path d="M 322 4 C 328 2, 332 8, 332 16 C 332 24, 328 30, 322 28" fill="none" stroke="#FFFFFF" stroke-opacity="0.3" stroke-width="2"/>
-          <circle cx="324" cy="16" r="3" fill="#1A1A1A" />
-          <circle cx="324" cy="16" r="1.5" fill="#7A7E85" />
+          <rect x="74" y="0" width="252" height="4" rx="2" fill="url(#hpFrameGrad)" />
+          <rect x="74" y="30" width="252" height="4" rx="2" fill="url(#hpFrameGrad)" />
+          <rect x="74" y="4" width="6" height="26" fill="url(#hpFrameGrad)" />
+          <rect x="320" y="4" width="6" height="26" fill="url(#hpFrameGrad)" />
 
-          <!-- Верхние и нижние металлические полосы каркаса -->
-          <rect x="84" y="0" width="232" height="4" rx="2" fill="url(#hpFrameGrad)" />
-          <rect x="84" y="28" width="232" height="4" rx="2" fill="url(#hpFrameGrad)" />
-          <rect x="84" y="4" width="4" height="24" fill="url(#hpFrameGrad)" />
-          <rect x="312" y="4" width="4" height="24" fill="url(#hpFrameGrad)" />
+          <path d="M 310 0 L 306 8 L 312 14 L 308 24 L 312 34" fill="none" stroke="#000000" stroke-width="1.5" opacity="0.6" />
+          <path d="M 310 0 L 306 8 L 312 14 L 308 24 L 312 34" fill="none" stroke="#FFFFFF" stroke-width="0.5" opacity="0.4" transform="translate(1, 0)"/>
 
-          <!-- Трещинка на правой части (декор) -->
-          <path d="M 300 0 L 296 8 L 302 14 L 298 24 L 302 32" fill="none" stroke="#000000" stroke-width="1.5" opacity="0.6" />
-          <path d="M 300 0 L 296 8 L 302 14 L 298 24 L 302 32" fill="none" stroke="#FFFFFF" stroke-width="0.5" opacity="0.4" transform="translate(1, 0)"/>
+          <text id="hpText" x="200" y="23" text-anchor="middle" font-size="18" font-weight="900" fill="#FFFFFF" font-family="system-ui, sans-serif" stroke="#000000" stroke-width="3" paint-order="stroke" letter-spacing="1">100</text>
         </g>
       </svg>
     </div>
@@ -721,25 +852,14 @@
   </div>
 
   <script>
-    /* ============================================================
-       JS: ЛОГИКА
-       ============================================================ */
     const STORAGE_KEY = 'lohmaty_club_state_v1';
 
-    // ---------- Состояние ----------
     function defaultState() {
       return {
-        balance: 0,
-        totalEarned: 0,
-        totalClicks: 0,
-        totalKills: 0,
-        snowmanIndex: 0,
-        clickLevels: {},
-        passiveLevels: {},
-        userName: 'Гость',
-        userUsername: '@guest',
-        lastPlayed: Date.now(), // П.4 для оффлайна
-        currentHp: 100,         // П.4 для оффлайна
+        balance: 0, totalEarned: 0, totalClicks: 0, totalKills: 0, snowmanIndex: 0,
+        clickLevels: {}, passiveLevels: {},
+        userName: 'Гость', userUsername: '@guest',
+        lastPlayed: Date.now(), currentHp: 100,
       };
     }
 
@@ -753,7 +873,6 @@
         if (typeof merged.currentHp !== 'number') merged.currentHp = 100;
         return merged;
       } catch (e) {
-        console.warn('Ошибка загрузки, старт с нуля', e);
         return defaultState();
       }
     }
@@ -763,14 +882,11 @@
         state.lastPlayed = Date.now();
         state.currentHp = hp;
         localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
-      } catch (e) {
-        console.warn('Ошибка сохранения', e);
-      }
+      } catch (e) {}
     }
 
     const state = loadState();
 
-    // ---------- Улучшения ----------
     const CLICK_UPGRADES = [
       { id: 'pick',    name: 'Крепкая кирка', bonus: 1,   basePrice: 50 },
       { id: 'iceaxe',  name: 'Ледоруб',        bonus: 5,   basePrice: 500 },
@@ -787,19 +903,19 @@
       { id: 'permafrost', name: 'Вечная мерзлота', bonus: 500, basePrice: 1000000 },
     ];
 
-    // ---------- DOM ----------
     const balanceTopEl = document.getElementById('balanceTop');
     const rateTopEl    = document.getElementById('rateTop');
+    const clickTopEl   = document.getElementById('clickTop');
     const userNameEl   = document.getElementById('userName');
     const userUsernameEl = document.getElementById('userUsername');
 
-    // ---------- Форматирование ----------
     function formatNumber(num) {
-      if (num < 1000) return Math.floor(num).toString();
+      if (num < 100000000) {
+        return Math.floor(num).toString().replace(/\B(?=(\d{3})+(?!\d))/g, ' ');
+      }
       const units = [
         { value: 1e9, symbol: 'млрд' },
         { value: 1e6, symbol: 'млн' },
-        { value: 1e3, symbol: 'тыс' }
       ];
       for (let i = 0; i < units.length; i++) {
         if (num >= units[i].value) {
@@ -811,7 +927,6 @@
       return Math.floor(num).toString();
     }
 
-    // ---------- Бонусы ----------
     function getClickBonus() {
       return 1 + CLICK_UPGRADES.reduce((sum, u) => sum + u.bonus * (state.clickLevels[u.id] || 0), 0);
     }
@@ -824,10 +939,10 @@
       return Math.floor(upgrade.basePrice * Math.pow(1.15, level));
     }
 
-    // ---------- UI ----------
     function updateHeaderUI() {
-      if (balanceTopEl) balanceTopEl.textContent = formatNumber(state.balance) + ' 🧊';
+      if (balanceTopEl) balanceTopEl.textContent = formatNumber(state.balance);
       if (rateTopEl)    rateTopEl.textContent    = `+${formatNumber(getPassiveBonus())}`;
+      if (clickTopEl)   clickTopEl.textContent   = formatNumber(getClickBonus());
       if (userNameEl)   userNameEl.textContent   = state.userName;
       if (userUsernameEl) userUsernameEl.textContent = state.userUsername;
     }
@@ -839,18 +954,23 @@
       balanceTopEl.classList.add('pulse');
     }
 
-    // ======================== ЭКРАН ЗАРАБОТКА ========================
     const wrap  = document.getElementById('icebergWrap');
     const svg   = document.getElementById('icebergSvg');
     const layer = document.getElementById('cubesLayer');
-    const swordEl    = document.getElementById('sword');
     const snowmanEl  = document.getElementById('snowmanGroup');
     const snowGround = document.getElementById('snowGround');
     const hpFill     = document.getElementById('hpFill');
     const hpText     = document.getElementById('hpText');
+    const hpBarGroup = document.getElementById('hpBar');
     const debrisLayer = document.getElementById('debrisLayer');
 
-    // ---------- HP снеговика ----------
+    // Элементы классов
+    const classKnight = document.getElementById('class-knight');
+    const classArcher = document.getElementById('class-archer');
+    const classMage   = document.getElementById('class-mage');
+
+    let currentSword = document.getElementById('sword-knight');
+
     let hp = 0;
     function getMaxHp() {
       return 100 + 10 * (state.snowmanIndex || 0);
@@ -859,22 +979,43 @@
     function updateHpBar() {
       const maxHp = getMaxHp();
       const pct = Math.max(0, hp) / maxHp;
-      hpFill.setAttribute('width', (224 * pct).toFixed(1)); // 224 — ширина внутреннего фона
+      hpFill.setAttribute('width', (240 * pct).toFixed(1));
       hpText.textContent = Math.max(0, Math.ceil(hp));
     }
 
-    // Инициализируем HP (учитывая сохранение)
+    function updateSnowmanClass() {
+      const index = state.snowmanIndex || 0;
+      const type = index % 3; // 0 - Knight, 1 - Archer, 2 - Mage
+
+      classKnight.style.display = 'none';
+      classArcher.style.display = 'none';
+      classMage.style.display = 'none';
+
+      if (type === 0) {
+        classKnight.style.display = 'block';
+        currentSword = document.getElementById('sword-knight');
+      } else if (type === 1) {
+        classArcher.style.display = 'block';
+        currentSword = null;
+      } else {
+        classMage.style.display = 'block';
+        currentSword = null;
+      }
+    }
+
     hp = state.currentHp;
     updateHpBar();
+    updateSnowmanClass();
 
-    // ---------- Скролл камеры (сдвиг земли) ----------
+    hpBarGroup.style.transition = 'opacity 0.3s ease';
+    hpBarGroup.style.opacity = '1';
+
     let snowOffset = 0;
     function scrollSnowBy(dx) {
       snowOffset += dx;
       snowGround.setAttribute('transform', `translate(${snowOffset} 0)`);
     }
 
-    // ---------- Клик по снеговику ----------
     let lastClick = 0;
     const CLICK_COOLDOWN = 60;
     let dead = false;
@@ -891,34 +1032,27 @@
       void snowmanEl.offsetWidth;
       snowmanEl.classList.add('hit');
 
-      swordEl.classList.remove('swing');
-      void swordEl.getBoundingClientRect();
-      swordEl.classList.add('swing');
+      if (currentSword) {
+        currentSword.classList.remove('swing');
+        void currentSword.getBoundingClientRect();
+        currentSword.classList.add('swing');
+      }
 
       spawnParticles(e.clientX, e.clientY);
 
       const reward = getClickBonus();
       applyDamage(reward);
-      spawnDmgPop(e.clientX, e.clientY, reward, false);
       spawnCube(e.clientX, e.clientY, reward);
+      spawnDmgPop(e.clientX, e.clientY, reward);
 
       state.totalClicks += 1;
       saveState();
     });
 
-    // ---------- Урон ----------
-    function applyDamage(amount, isPassive = false) {
+    function applyDamage(amount) {
       if (dead) return;
       hp -= amount;
       updateHpBar();
-      
-      if (isPassive) {
-        // Показываем всплывашку пассивного урона (маленькую, без раздувания)
-        const rect = svg.getBoundingClientRect();
-        const cx = rect.left + rect.width * 0.5;
-        const cy = rect.top - 10; // чуть выше бара
-        spawnDmgPop(cx, cy, amount, true);
-      }
 
       if (hp <= 0) {
         hp = 0;
@@ -927,7 +1061,6 @@
       }
     }
 
-    // ---------- Смерть снеговика ----------
     function killSnowman() {
       dead = true;
 
@@ -939,16 +1072,21 @@
       snowmanEl.style.transition = 'opacity 0.15s ease';
       snowmanEl.style.opacity = '0';
 
+      hpBarGroup.style.opacity = '0';
+
       createDebris();
 
-      // Обновляем счётчики
+      const lootCount = Math.floor(Math.random() * 6) + 5;
+      for (let i = 0; i < lootCount; i++) {
+        spawnLootCube(cx, cy, 0);
+      }
+
       state.totalKills = (state.totalKills || 0) + 1;
       state.snowmanIndex = (state.snowmanIndex || 0) + 1;
       saveState();
 
       setTimeout(() => {
         scrollSnowBy(-420);
-
         debrisLayer.style.transition = 'transform 0.5s ease-in, opacity 0.5s ease-in';
         debrisLayer.style.transform  = 'translateX(-480px)';
         debrisLayer.style.opacity    = '0';
@@ -965,9 +1103,9 @@
           void snowGround.offsetWidth;
           snowGround.style.transition = '';
 
-          // Новый HP по номеру
           hp = getMaxHp();
           updateHpBar();
+          updateSnowmanClass();
 
           snowmanEl.style.transition = 'none';
           snowmanEl.style.transform  = 'translateX(480px)';
@@ -978,6 +1116,8 @@
             snowmanEl.style.transform  = 'translateX(0)';
             snowmanEl.style.opacity    = '1';
 
+            hpBarGroup.style.opacity = '1';
+
             setTimeout(() => {
               snowmanEl.style.transition = '';
               dead = false;
@@ -987,149 +1127,6 @@
       }, 220);
     }
 
-    // ---------- Осколки ----------
-    function createDebris() {
-      const clones = [];
-
-      const snowCircles = snowmanEl.querySelectorAll('.bob > circle');
-      const bodyCircles = Array.from(snowCircles).slice(0, 3);
-      bodyCircles.forEach((c) => {
-        const clone = c.cloneNode(true);
-        clone.setAttribute('fill', 'url(#snow)');
-        debrisLayer.appendChild(clone);
-        clones.push({ node: clone, type: 'ball' });
-      });
-
-      const helmet = document.createElementNS('http://www.w3.org/2000/svg', 'g');
-      helmet.innerHTML = `
-        <path d="M164 86 Q164 38 200 36 Q236 38 236 86 Z" fill="url(#steel)" stroke="#4A5563" stroke-width="1.5" stroke-linejoin="round"/>
-        <path d="M200 38 V86" stroke="#FFFFFF" stroke-opacity="0.6" stroke-width="1.5"/>
-        <path d="M176 52 Q180 44 190 41" stroke="#FFFFFF" stroke-opacity="0.8" stroke-width="3" fill="none" stroke-linecap="round"/>
-        <ellipse cx="200" cy="86" rx="43" ry="9" fill="url(#steelDark)" stroke="#2F3945" stroke-width="1.5"/>
-        <ellipse cx="200" cy="84" rx="43" ry="8" fill="none" stroke="url(#gold)" stroke-width="2.5"/>
-        <g fill="url(#gold)">
-          <circle cx="170" cy="88" r="1.8"/>
-          <circle cx="185" cy="92" r="1.8"/>
-          <circle cx="200" cy="93.5" r="1.8"/>
-          <circle cx="215" cy="92" r="1.8"/>
-          <circle cx="230" cy="88" r="1.8"/>
-        </g>
-        <path d="M196 40 Q186 12 214 8 Q238 6 246 24 Q228 18 220 32 Q214 20 205 38 Z" fill="url(#cape)" stroke="#5A0F1A" stroke-width="1" stroke-linejoin="round"/>
-      `;
-      debrisLayer.appendChild(helmet);
-      clones.push({ node: helmet, type: 'helmet' });
-
-      const nose = document.createElementNS('http://www.w3.org/2000/svg', 'path');
-      nose.setAttribute('d', 'M195 103 L205 103 L200 118 Z');
-      nose.setAttribute('fill', '#F08A24');
-      nose.setAttribute('stroke', '#B85E10');
-      nose.setAttribute('stroke-width', '1');
-      nose.setAttribute('stroke-linejoin', 'round');
-      debrisLayer.appendChild(nose);
-      clones.push({ node: nose, type: 'nose' });
-
-      const shield = document.createElementNS('http://www.w3.org/2000/svg', 'g');
-      shield.innerHTML = `
-        <path d="M98 128 L152 128 L152 168 Q152 196 125 210 Q98 196 98 168 Z" fill="url(#shieldBlue)" stroke="url(#steel)" stroke-width="4" stroke-linejoin="round"/>
-        <path d="M125 132 V204 M101 158 H149" stroke="url(#gold)" stroke-width="6" stroke-linecap="butt"/>
-        <circle cx="125" cy="158" r="7" fill="url(#gold)" stroke="#8A6A12" stroke-width="1"/>
-        <path d="M104 132 L104 160" stroke="#FFFFFF" stroke-opacity="0.35" stroke-width="3" stroke-linecap="round"/>
-      `;
-      debrisLayer.appendChild(shield);
-      clones.push({ node: shield, type: 'shield' });
-
-      const swordClone = document.createElementNS('http://www.w3.org/2000/svg', 'g');
-      swordClone.innerHTML = `
-        <polygon points="264,124 272,124 271,56 268,44 265,56" fill="url(#steel)" stroke="#4A5563" stroke-width="1" stroke-linejoin="round"/>
-        <path d="M268 54 V122" stroke="#FFFFFF" stroke-opacity="0.7" stroke-width="1.4"/>
-        <rect x="254" y="122" width="28" height="6" rx="2" fill="url(#gold)" stroke="#8A6A12" stroke-width="1"/>
-        <rect x="266" y="128" width="4" height="16" fill="#5B3A22"/>
-        <circle cx="268" cy="147" r="4" fill="url(#gold)" stroke="#8A6A12" stroke-width="1"/>
-        <circle cx="268" cy="134" r="4.5" fill="#5B3A22"/>
-      `;
-      debrisLayer.appendChild(swordClone);
-      clones.push({ node: swordClone, type: 'sword' });
-
-      clones.forEach((item) => {
-        let startX = 200, startY = 150;
-        if (item.type === 'ball') {
-          const bbox = item.node.getBBox();
-          startX = bbox.x + bbox.width / 2;
-          startY = bbox.y + bbox.height / 2;
-        } else if (item.type === 'helmet') {
-          startX = 200; startY = 60;
-        } else if (item.type === 'nose') {
-          startX = 200; startY = 110;
-        } else if (item.type === 'shield') {
-          startX = 125; startY = 168;
-        } else if (item.type === 'sword') {
-          startX = 268; startY = 100;
-        }
-
-        const dir = Math.random() < 0.5 ? -1 : 1;
-        const vx = dir * (60 + Math.random() * 120);
-        const vy = -(60 + Math.random() * 140);
-        const gravity = 420;
-        const rotSpeed = (Math.random() - 0.5) * 900;
-
-        const t0 = performance.now();
-        const duration = 900;
-
-        function step(now) {
-          const t = Math.min(1, (now - t0) / duration);
-          const x = startX + vx * t;
-          const y = startY + vy * t + 0.5 * gravity * t * t;
-          const rot = rotSpeed * t;
-          const dx = x - startX;
-          const dy = y - startY;
-          item.node.setAttribute('transform', `translate(${dx} ${dy}) rotate(${rot} ${startX} ${startY})`);
-          if (t < 1) requestAnimationFrame(step);
-        }
-        requestAnimationFrame(step);
-      });
-    }
-
-    // ---------- Всплывающий урон ----------
-    function spawnDmgPop(x, y, amount, isPassive = false) {
-      const el = document.createElement('div');
-      el.className = 'dmg-pop';
-      el.style.left = x + 'px';
-      el.style.top  = y + 'px';
-      
-      if (isPassive) {
-        // П.3: Тонкая, аккуратная цифра для пассивного урона
-        el.style.fontSize = '12px';
-        el.style.color = '#FFA3A3';
-        el.style.opacity = '0.8';
-        el.textContent = '-' + formatNumber(amount);
-      } else {
-        el.textContent = '-' + formatNumber(amount);
-      }
-      
-      document.body.appendChild(el);
-      setTimeout(() => el.remove(), 600);
-    }
-
-    // ---------- Искры ----------
-    function spawnParticles(x, y, count = 18) {
-      for (let i = 0; i < count; i++) {
-        const p = document.createElement('div');
-        p.className = 'particle';
-        p.style.left = x + 'px';
-        p.style.top  = y + 'px';
-        const angle = Math.random() * Math.PI * 2;
-        const dist  = 50 + Math.random() * 80;
-        p.style.setProperty('--angle', `${angle}rad`);
-        p.style.setProperty('--distance', `${dist}px`);
-        const size = 6 + Math.random() * 8;
-        p.style.width  = `${size}px`;
-        p.style.height = `${size}px`;
-        document.body.appendChild(p);
-        setTimeout(() => p.remove(), 600);
-      }
-    }
-
-    // ---------- Кубик ----------
     function spawnCube(startX, startY, reward) {
       const cube = document.createElement('div');
       cube.className = 'cube';
@@ -1156,94 +1153,168 @@
       });
     }
 
-    // ---------- П.3: Плавный пассивный урон ----------
-    let lastPassiveTick = performance.now();
+    function spawnLootCube(startX, startY, reward) {
+      const cube = document.createElement('div');
+      cube.className = 'loot-cube';
+      cube.style.left = startX + 'px';
+      cube.style.top  = startY + 'px';
+
+      const lx = (Math.random() - 0.5) * 160;
+      const ly = 40 + Math.random() * 40;
+      
+      cube.style.setProperty('--lx', lx + 'px');
+      cube.setAttribute('--ly', ly + 'px');
+
+      layer.appendChild(cube);
+
+      cube.addEventListener('animationend', () => {
+        cube.remove();
+      });
+    }
+
+    function createDebris() {
+      const clones = [];
+      const snowCircles = snowmanEl.querySelectorAll('.bob > circle');
+      const bodyCircles = Array.from(snowCircles).slice(0, 3);
+      bodyCircles.forEach((c) => {
+        const clone = c.cloneNode(true);
+        clone.setAttribute('fill', 'url(#snow)');
+        debrisLayer.appendChild(clone);
+        clones.push({ node: clone, type: 'ball' });
+      });
+
+      const nose = document.createElementNS('http://www.w3.org/2000/svg', 'path');
+      nose.setAttribute('d', 'M195 103 L205 103 L200 118 Z');
+      nose.setAttribute('fill', '#F08A24');
+      debrisLayer.appendChild(nose);
+      clones.push({ node: nose, type: 'nose' });
+
+      let activeClassEl = classKnight;
+      if (state.snowmanIndex % 3 === 1) activeClassEl = classArcher;
+      if (state.snowmanIndex % 3 === 2) activeClassEl = classMage;
+
+      const activeClone = activeClassEl.cloneNode(true);
+      activeClone.removeAttribute('id');
+      activeClone.style.display = 'block';
+      debrisLayer.appendChild(activeClone);
+      clones.push({ node: activeClone, type: 'gear' });
+
+      clones.forEach((item) => {
+        let startX = 200, startY = 150;
+        if (item.type === 'ball') {
+          const bbox = item.node.getBBox();
+          startX = bbox.x + bbox.width / 2;
+          startY = bbox.y + bbox.height / 2;
+        } else if (item.type === 'nose') {
+          startX = 200; startY = 110;
+        } else if (item.type === 'gear') {
+          startX = 200; startY = 150;
+        }
+
+        const dir = Math.random() < 0.5 ? -1 : 1;
+        const vx = dir * (60 + Math.random() * 120);
+        const vy = -(60 + Math.random() * 140);
+        const gravity = 420;
+        const rotSpeed = (Math.random() - 0.5) * 900;
+
+        const t0 = performance.now();
+        const duration = 900;
+
+        function step(now) {
+          const t = Math.min(1, (now - t0) / duration);
+          const x = startX + vx * t;
+          const y = startY + vy * t + 0.5 * gravity * t * t;
+          const rot = rotSpeed * t;
+          const dx = x - startX;
+          const dy = y - startY;
+          item.node.setAttribute('transform', `translate(${dx} ${dy}) rotate(${rot} ${startX} ${startY})`);
+          if (t < 1) requestAnimationFrame(step);
+        }
+        requestAnimationFrame(step);
+      });
+    }
+
+    function spawnDmgPop(x, y, amount) {
+      const el = document.createElement('div');
+      el.className = 'dmg-pop';
+      el.style.left = x + 'px';
+      el.style.top  = y + 'px';
+      el.textContent = '-' + formatNumber(amount);
+      document.body.appendChild(el);
+      setTimeout(() => el.remove(), 600);
+    }
+
+    function spawnParticles(x, y, count = 18) {
+      for (let i = 0; i < count; i++) {
+        const p = document.createElement('div');
+        p.className = 'particle';
+        p.style.left = x + 'px';
+        p.style.top  = y + 'px';
+        const angle = Math.random() * Math.PI * 2;
+        const dist  = 50 + Math.random() * 80;
+        p.style.setProperty('--angle', `${angle}rad`);
+        p.style.setProperty('--distance', `${dist}px`);
+        const size = 6 + Math.random() * 8;
+        p.style.width  = `${size}px`;
+        p.style.height = `${size}px`;
+        document.body.appendChild(p);
+        setTimeout(() => p.remove(), 600);
+      }
+    }
+
     setInterval(() => {
       const income = getPassiveBonus();
-      if (income > 0) {
-        // Начисляем доход (распределённо)
-        state.balance += income / 20;
-        state.totalEarned += income / 20;
-        updateHeaderUI();
-        saveState();
-
-        // Наносим урон
-        applyDamage(income / 20, true);
+      if (income > 0 && !dead) {
+        applyDamage(income / 20);
       }
-    }, 50); // 20 раз в секунду = 50 мс
+    }, 50);
 
-    // ---------- П.4: Оффлайн-урон (вне игры) ----------
     function processOfflineProgress() {
       const now = Date.now();
       const last = state.lastPlayed || now;
       const diffMs = now - last;
-      
-      // Если прошло меньше 5 секунд, ничего не делаем
       if (diffMs < 5000) return;
 
       const income = getPassiveBonus();
       if (income <= 0) return;
 
-      // Отнимаем урон, накопленный за это время (максимум 24 часа, чтобы не улететь в минус)
       const offlineSeconds = Math.min(diffMs / 1000, 24 * 3600);
       let totalDamage = income * offlineSeconds;
       
-      // Начисляем баланс за оффлайн
       const offlineEarned = income * offlineSeconds;
       state.balance += offlineEarned;
       state.totalEarned += offlineEarned;
 
-      // Прокручиваем убийства снеговиков
       while (totalDamage > 0) {
-        // Если снеговик сейчас мертв (в процессе анимации), пропускаем урон
         if (dead) {
-          // Искусственно сбрасываем анимацию (без визуалки)
-          hp = getMaxHp();
-          updateHpBar();
-          state.snowmanIndex++;
-          state.totalKills = (state.totalKills || 0) + 1;
+          hp = getMaxHp(); updateHpBar();
+          state.snowmanIndex++; state.totalKills = (state.totalKills || 0) + 1;
           continue;
         }
-
         if (totalDamage >= hp) {
-          // Убиваем
           totalDamage -= hp;
-          state.snowmanIndex++;
-          state.totalKills = (state.totalKills || 0) + 1;
+          state.snowmanIndex++; state.totalKills = (state.totalKills || 0) + 1;
           hp = getMaxHp();
         } else {
-          // Наносим остаточный урон
-          hp -= totalDamage;
-          totalDamage = 0;
+          hp -= totalDamage; totalDamage = 0;
         }
       }
 
-      // Обновляем визуал
-      updateHpBar();
-      updateHeaderUI();
-      saveState();
-
-      // Если HP <= 0 (не должно случиться, но на всякий)
-      if (hp <= 0) {
-        hp = getMaxHp();
-        updateHpBar();
-      }
+      updateHpBar(); updateHeaderUI(); saveState();
+      if (hp <= 0) { hp = getMaxHp(); updateHpBar(); }
+      updateSnowmanClass();
     }
 
-    // Запуск при старте
     processOfflineProgress();
 
-    // Отслеживаем возврат на вкладку
     document.addEventListener('visibilitychange', () => {
       if (document.visibilityState === 'visible') {
-        processOfflineProgress();
-        saveState(); // Обновляем lastPlayed
+        processOfflineProgress(); saveState();
       } else {
-        saveState(); // Сохраняем при уходе
+        saveState();
       }
     });
 
-    // ---------- Навигация ----------
     const navButtons = document.querySelectorAll('.nav-btn');
     const pages = {
       earn: document.getElementById('page-earn'),
@@ -1264,7 +1335,6 @@
       });
     });
 
-    // ======================== УЛУЧШЕНИЯ ========================
     const upgradesList = document.getElementById('upgradesList');
     const tabs = document.querySelectorAll('.tab');
     let activeUpgradeTab = 'click';
@@ -1333,7 +1403,6 @@
       renderUpgrades();
     });
 
-    // ======================== ПРОФИЛЬ ========================
     function updateProfileUI() {
       document.getElementById('statTotalEarned').textContent = formatNumber(state.totalEarned);
       document.getElementById('statClicks').textContent      = formatNumber(state.totalClicks);
@@ -1362,22 +1431,19 @@
       Object.assign(state, fresh);
       localStorage.removeItem(STORAGE_KEY);
       
-      // Сброс визуала
       hp = getMaxHp();
       updateHpBar();
       updateHeaderUI();
       updateProfileUI();
+      updateSnowmanClass();
       closeModal(confirmModal);
     });
 
-    // ---------- Инициализация ----------
     updateHeaderUI();
     renderUpgrades();
     updateProfileUI();
 
-    // Регулярное сохранение, чтобы lastPlayed обновлялся
     setInterval(saveState, 5000);
-
   </script>
 </body>
 </html>
