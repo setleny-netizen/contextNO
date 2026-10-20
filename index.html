@@ -99,20 +99,24 @@
     .page.active { display: flex; flex-direction: column; }
 
     /* ================= ЭКРАН: ЗАРАБОТОК ================= */
+    /* Пункт 1: прижимаем всё к нижнему меню */
     .page--earn {
       align-items: center;
-      justify-content: center;
-      gap: 14px;
+      justify-content: flex-end;
+      gap: 0;
       overflow: hidden;
+      padding-bottom: 0;
     }
 
     .iceberg-wrap {
       position: relative;
       width: 300px;
       height: 217px;
+      flex-shrink: 0;
       transition: transform 0.08s ease;
       -webkit-tap-highlight-color: transparent;
       cursor: pointer;
+      margin-bottom: -6px; /* чуть подсаживаем к нижнему краю */
     }
 
     .iceberg-svg { width: 100%; height: 100%; display: block; pointer-events: auto; overflow: visible; }
@@ -165,17 +169,6 @@
       0%,100% { transform: translateX(0) scale(1); }
       25%     { transform: translateX(-3px) scale(0.99); }
       60%     { transform: translateX(3px)  scale(1.01); }
-    }
-
-    #snowmanGroup.collapse {
-      animation: collapse 0.5s ease-in forwards;
-      transform-box: fill-box;
-      transform-origin: 50% 100%;
-    }
-    @keyframes collapse {
-      0%   { opacity: 1; transform: scale(1) translateY(0); }
-      60%  { opacity: 0.7; transform: scale(0.85) translateY(8px); }
-      100% { opacity: 0; transform: scale(0.4) translateY(30px); }
     }
 
     #snowmanGroup.spawn {
@@ -236,7 +229,7 @@
       100% { transform: translate(calc(-50% + cos(var(--angle)) * var(--distance)), calc(-50% + sin(var(--angle)) * var(--distance) + 30px)) scale(0.3); opacity: 0; }
     }
 
-    .hintbar { text-align: center; pointer-events: none; }
+    .hintbar { text-align: center; pointer-events: none; padding-bottom: 4px; }
     .hint-text { font-size: 13px; color: var(--muted); letter-spacing: 0.02em; }
 
     /* ================= ЭКРАН: УЛУЧШЕНИЯ ================= */
@@ -408,9 +401,7 @@
 
         <!-- ===== ЗЕМЛЯ: бесконечные сугробы по всему горизонту ===== -->
         <g id="snowGround" pointer-events="none">
-          <!-- Нижний пласт (глубина) -->
           <rect x="-1400" y="252" width="3200" height="120" fill="#9FC4DF" opacity="0.55"/>
-          <!-- Волнистая поверхность сугробов, растянутая на весь горизонт -->
           <path d="
             M -1400 252
             Q -1350 232  -1300 246
@@ -448,9 +439,7 @@
             L 1800 400
             L -1400 400 Z
           " fill="url(#driftGrad)" opacity="0.97"/>
-          <!-- Текстура-снежинки поверх -->
           <rect x="-1400" y="252" width="3200" height="50" fill="url(#snowPattern)" opacity="0.55"/>
-          <!-- Блик по верху сугроба -->
           <path d="
             M -1400 252
             Q -1350 232  -1300 246
@@ -488,7 +477,7 @@
           " stroke="#FFFFFF" stroke-opacity="0.85" stroke-width="2.5" fill="none"/>
         </g>
 
-        <!-- ===== HP-бар над головой (поднят выше плюмажа) ===== -->
+        <!-- ===== HP-бар: отдельный слой над головой (пункт 2) ===== -->
         <g id="hpBar" pointer-events="none">
           <rect x="120" y="0" width="160" height="14" rx="7" fill="#1A1A1A" stroke="#1F1F1F" stroke-width="1"/>
           <rect id="hpFill" x="122" y="2" width="156" height="10" rx="5" fill="#EF4444"/>
@@ -497,7 +486,6 @@
 
         <!-- ===== СНЕГОВИК ===== -->
         <g id="snowmanGroup">
-          <!-- Падающий снег -->
           <g fill="#FFFFFF" pointer-events="none">
             <circle class="snowfall"    cx="60"  cy="40" r="2.2"/>
             <circle class="snowfall s2" cx="110" cy="20" r="1.8"/>
@@ -508,11 +496,9 @@
           </g>
 
           <g class="bob">
-            <!-- ПЛАЩ -->
             <path d="M165 118 Q108 190 124 246 Q200 230 276 246 Q292 190 235 118 Z" fill="url(#cape)"/>
             <path d="M150 190 Q146 225 150 240 M250 190 Q254 225 250 240" stroke="#3E0A12" stroke-opacity="0.35" stroke-width="2" fill="none" stroke-linecap="round"/>
 
-            <!-- ТЕЛО -->
             <circle cx="200" cy="212" r="52" fill="url(#snow)"/>
             <circle cx="200" cy="145" r="40" fill="url(#snow)"/>
             <circle cx="200" cy="88"  r="32" fill="url(#snow)"/>
@@ -586,7 +572,7 @@
           </g>
         </g>
 
-        <!-- ===== СЛОЙ ДЛЯ РАЗВАЛИН (заполняется при смерти) ===== -->
+        <!-- ===== СЛОЙ ДЛЯ РАЗВАЛИН ===== -->
         <g id="debrisLayer"></g>
       </svg>
     </div>
@@ -627,6 +613,10 @@
       <div class="stat-card">
         <div class="stat-card__label">Добыча за клик</div>
         <div class="stat-card__value" id="statClickBonus">1</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-card__label">Снеговиков повержено</div>
+        <div class="stat-card__value" id="statKills">0</div>
       </div>
       <div class="reset-block">
         <button class="reset-btn" type="button" id="resetStartBtn">Сбросить прогресс</button>
@@ -692,6 +682,8 @@
         balance: 0,
         totalEarned: 0,
         totalClicks: 0,
+        totalKills: 0,        // Пункт 4: счётчик убитых снеговиков
+        snowmanIndex: 0,      // текущий номер снеговика (0 -> 100 HP)
         clickLevels: {},
         passiveLevels: {},
         userName: 'Гость',
@@ -790,43 +782,6 @@
       balanceTopEl.classList.add('pulse');
     }
 
-    // ---------- Пассивный доход ----------
-    setInterval(() => {
-      const income = getPassiveBonus();
-      if (income > 0) {
-        state.balance += income;
-        state.totalEarned += income;
-        updateHeaderUI();
-        saveState();
-      }
-    }, 1000);
-
-    // ---------- Навигация (SPA) ----------
-    const navButtons = document.querySelectorAll('.nav-btn');
-    const pages = {
-      earn: document.getElementById('page-earn'),
-      upgrades: document.getElementById('page-upgrades'),
-      profile: document.getElementById('page-profile')
-    };
-
-    navButtons.forEach(btn => {
-      btn.addEventListener('click', (e) => {
-        e.preventDefault();
-        const target = btn.dataset.nav;
-
-        navButtons.forEach(b => b.classList.remove('active'));
-        btn.classList.add('active');
-
-        Object.keys(pages).forEach(key => {
-          pages[key].classList.remove('active');
-        });
-        pages[target].classList.add('active');
-
-        if (target === 'upgrades') renderUpgrades();
-        if (target === 'profile') updateProfileUI();
-      });
-    });
-
     // ======================== ЭКРАН ЗАРАБОТКА ========================
     const wrap  = document.getElementById('icebergWrap');
     const svg   = document.getElementById('icebergSvg');
@@ -838,15 +793,21 @@
     const hpText     = document.getElementById('hpText');
     const debrisLayer = document.getElementById('debrisLayer');
 
-    // ---------- HP снеговика ----------
-    const MAX_HP = 100;
-    let hp = MAX_HP;
+    // ---------- HP снеговика (пункт 4: растёт на 10 за каждого) ----------
+    let hp = 0;
+    function getMaxHp() {
+      return 100 + 10 * (state.snowmanIndex || 0);
+    }
 
     function updateHpBar() {
-      const pct = Math.max(0, hp) / MAX_HP;
+      const maxHp = getMaxHp();
+      const pct = Math.max(0, hp) / maxHp;
       hpFill.setAttribute('width', (156 * pct).toFixed(1));
-      hpText.textContent = `${Math.max(0, Math.ceil(hp))} / ${MAX_HP}`;
+      hpText.textContent = `${Math.max(0, Math.ceil(hp))} / ${maxHp}`;
     }
+
+    // Инициализируем HP
+    hp = getMaxHp();
     updateHpBar();
 
     // ---------- Скролл камеры (сдвиг земли) ----------
@@ -869,7 +830,6 @@
       if (now - lastClick < CLICK_COOLDOWN) return;
       lastClick = now;
 
-      // Анимация
       snowmanEl.classList.remove('hit');
       void snowmanEl.offsetWidth;
       snowmanEl.classList.add('hit');
@@ -880,68 +840,69 @@
 
       spawnParticles(e.clientX, e.clientY);
 
-      // Урон и награда
       const reward = getClickBonus();
-      hp -= reward;
-      updateHpBar();
+      applyDamage(reward);
       spawnDmgPop(e.clientX, e.clientY, reward);
       spawnCube(e.clientX, e.clientY, reward);
 
       state.totalClicks += 1;
       saveState();
-
-      if (hp <= 0) killSnowman();
     });
 
-    // ---------- Смерть снеговика: развал на части ----------
+    // ---------- Урон ----------
+    function applyDamage(amount) {
+      if (dead) return;
+      hp -= amount;
+      updateHpBar();
+      if (hp <= 0) {
+        hp = 0;
+        updateHpBar();
+        killSnowman();
+      }
+    }
+
+    // ---------- Смерть снеговика ----------
     function killSnowman() {
       dead = true;
-      hp = 0;
-      updateHpBar();
 
-      snowmanEl.classList.remove('hit');
-
-      // Частицы «развала»
       const rect = svg.getBoundingClientRect();
       const cx = rect.left + rect.width  * 0.5;
       const cy = rect.top  + rect.height * 0.72;
       spawnParticles(cx, cy, 30);
 
-      // Скрываем целого снеговика мгновенно
       snowmanEl.style.transition = 'opacity 0.15s ease';
       snowmanEl.style.opacity = '0';
 
-      // Создаём осколки (в SVG-координатах)
       createDebris();
 
+      // Обновляем счётчики
+      state.totalKills = (state.totalKills || 0) + 1;
+      state.snowmanIndex = (state.snowmanIndex || 0) + 1;
+      saveState();
+
       setTimeout(() => {
-        // Камера едет вправо — земля и развалины уходят влево
         scrollSnowBy(-420);
 
-        // Отъезд развалин влево
         debrisLayer.style.transition = 'transform 0.5s ease-in, opacity 0.5s ease-in';
         debrisLayer.style.transform  = 'translateX(-480px)';
         debrisLayer.style.opacity    = '0';
 
         setTimeout(() => {
-          // Очистка
           debrisLayer.innerHTML = '';
           debrisLayer.style.transition = 'none';
           debrisLayer.style.transform  = 'translateX(0)';
           debrisLayer.style.opacity    = '1';
 
-          // Сброс земли
           snowGround.style.transition = 'none';
           snowGround.setAttribute('transform', 'translate(0 0)');
           snowOffset = 0;
           void snowGround.offsetWidth;
           snowGround.style.transition = '';
 
-          // Новый HP
-          hp = MAX_HP;
+          // Новый HP по номеру
+          hp = getMaxHp();
           updateHpBar();
 
-          // Новый снеговик въезжает справа
           snowmanEl.style.transition = 'none';
           snowmanEl.style.transform  = 'translateX(480px)';
           snowmanEl.style.opacity    = '0';
@@ -960,29 +921,11 @@
       }, 220);
     }
 
-    // ---------- Создание осколков (SVG) ----------
+    // ---------- Осколки ----------
     function createDebris() {
-      // Собираем все группы, которые будут разлетаться.
-      // Части: голова (с лицом/шлемом), морковка, шлем, щит, меч, 3 снежных кома.
-      // Идея: клонируем текущий снеговик и разрезаем на части, задавая каждой
-      // случайную скорость + вращение + падение вниз.
-
-      // Снежные комы: позиции центров и радиусы
-      const parts = [
-        // Верхний ком (голова)
-        { type: 'circle', cx: 200, cy: 88,  r: 32 },
-        // Средний ком
-        { type: 'circle', cx: 200, cy: 145, r: 40 },
-        // Нижний ком
-        { type: 'circle', cx: 200, cy: 212, r: 52 },
-      ];
-
-      // Отдельные элементы (клоны)
       const clones = [];
 
-      // Клонируем снежные комы из текущего снеговика
       const snowCircles = snowmanEl.querySelectorAll('.bob > circle');
-      // В SVG есть 3 больших круга — клонируем их по одному
       const bodyCircles = Array.from(snowCircles).slice(0, 3);
       bodyCircles.forEach((c) => {
         const clone = c.cloneNode(true);
@@ -991,8 +934,6 @@
         clones.push({ node: clone, type: 'ball' });
       });
 
-      // Клонируем шлем (path + эллипс + плюмаж) — упрощённо: берём group шлема
-      // Так как в исходной разметке шлем не в отдельной group, соберём вручную:
       const helmet = document.createElementNS('http://www.w3.org/2000/svg', 'g');
       helmet.innerHTML = `
         <path d="M164 86 Q164 38 200 36 Q236 38 236 86 Z" fill="url(#steel)" stroke="#4A5563" stroke-width="1.5" stroke-linejoin="round"/>
@@ -1012,7 +953,6 @@
       debrisLayer.appendChild(helmet);
       clones.push({ node: helmet, type: 'helmet' });
 
-      // Клонируем морковку (треугольник носа)
       const nose = document.createElementNS('http://www.w3.org/2000/svg', 'path');
       nose.setAttribute('d', 'M195 103 L205 103 L200 118 Z');
       nose.setAttribute('fill', '#F08A24');
@@ -1022,7 +962,6 @@
       debrisLayer.appendChild(nose);
       clones.push({ node: nose, type: 'nose' });
 
-      // Клонируем щит
       const shield = document.createElementNS('http://www.w3.org/2000/svg', 'g');
       shield.innerHTML = `
         <path d="M98 128 L152 128 L152 168 Q152 196 125 210 Q98 196 98 168 Z" fill="url(#shieldBlue)" stroke="url(#steel)" stroke-width="4" stroke-linejoin="round"/>
@@ -1033,7 +972,6 @@
       debrisLayer.appendChild(shield);
       clones.push({ node: shield, type: 'shield' });
 
-      // Клонируем меч
       const swordClone = document.createElementNS('http://www.w3.org/2000/svg', 'g');
       swordClone.innerHTML = `
         <polygon points="264,124 272,124 271,56 268,44 265,56" fill="url(#steel)" stroke="#4A5563" stroke-width="1" stroke-linejoin="round"/>
@@ -1046,9 +984,7 @@
       debrisLayer.appendChild(swordClone);
       clones.push({ node: swordClone, type: 'sword' });
 
-      // --- Анимация: каждой части — случайное направление и вращение ---
       clones.forEach((item) => {
-        // Стартовый центр части
         let startX = 200, startY = 150;
         if (item.type === 'ball') {
           const bbox = item.node.getBBox();
@@ -1064,34 +1000,24 @@
           startX = 268; startY = 100;
         }
 
-        // Случайное направление: влево или вправо
         const dir = Math.random() < 0.5 ? -1 : 1;
         const vx = dir * (60 + Math.random() * 120);
-        const vy = -(60 + Math.random() * 140); // вверх-в стороны
+        const vy = -(60 + Math.random() * 140);
         const gravity = 420;
         const rotSpeed = (Math.random() - 0.5) * 900;
-        const startRot = 0;
 
         const t0 = performance.now();
-        const duration = 900; // мс
-        let curX = startX, curY = startY, curRot = startRot;
+        const duration = 900;
 
         function step(now) {
           const t = Math.min(1, (now - t0) / duration);
-          // Физика (упрощённая): x = x0 + vx*t, y = y0 + vy*t + 0.5*g*t^2
           const x = startX + vx * t;
           const y = startY + vy * t + 0.5 * gravity * t * t;
-          const rot = startRot + rotSpeed * t;
-
-          // Сдвиг относительно исходного положения части
+          const rot = rotSpeed * t;
           const dx = x - startX;
           const dy = y - startY;
-
           item.node.setAttribute('transform', `translate(${dx} ${dy}) rotate(${rot} ${startX} ${startY})`);
-
-          if (t < 1) {
-            requestAnimationFrame(step);
-          }
+          if (t < 1) requestAnimationFrame(step);
         }
         requestAnimationFrame(step);
       });
@@ -1127,7 +1053,7 @@
       }
     }
 
-    // ---------- Летящий кубик на баланс ----------
+    // ---------- Кубик ----------
     function spawnCube(startX, startY, reward) {
       const cube = document.createElement('div');
       cube.className = 'cube';
@@ -1153,6 +1079,41 @@
         cube.remove();
       });
     }
+
+    // ---------- Пассивный доход (пункт 3: тоже наносит урон) ----------
+    setInterval(() => {
+      const income = getPassiveBonus();
+      if (income > 0) {
+        state.balance += income;
+        state.totalEarned += income;
+        updateHeaderUI();
+        saveState();
+
+        // Наносим урон пассивкой
+        applyDamage(income);
+      }
+    }, 1000);
+
+    // ---------- Навигация ----------
+    const navButtons = document.querySelectorAll('.nav-btn');
+    const pages = {
+      earn: document.getElementById('page-earn'),
+      upgrades: document.getElementById('page-upgrades'),
+      profile: document.getElementById('page-profile')
+    };
+
+    navButtons.forEach(btn => {
+      btn.addEventListener('click', (e) => {
+        e.preventDefault();
+        const target = btn.dataset.nav;
+        navButtons.forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+        Object.keys(pages).forEach(key => pages[key].classList.remove('active'));
+        pages[target].classList.add('active');
+        if (target === 'upgrades') renderUpgrades();
+        if (target === 'profile') updateProfileUI();
+      });
+    });
 
     // ======================== УЛУЧШЕНИЯ ========================
     const upgradesList = document.getElementById('upgradesList');
@@ -1213,7 +1174,6 @@
 
       const level = levels[id] || 0;
       const price = getUpgradePrice(upgrade, level);
-
       if (state.balance < price) return;
 
       state.balance -= price;
@@ -1231,6 +1191,7 @@
       document.getElementById('statBalance').textContent     = formatNumber(state.balance);
       document.getElementById('statRate').textContent        = formatNumber(getPassiveBonus());
       document.getElementById('statClickBonus').textContent  = formatNumber(getClickBonus());
+      document.getElementById('statKills').textContent       = formatNumber(state.totalKills || 0);
     }
 
     const confirmModal    = document.getElementById('confirmModal');
@@ -1244,15 +1205,15 @@
       if (e.target.closest('[data-close]')) closeModal(confirmModal);
     });
 
-    resetStartBtn.addEventListener('click', () => {
-      openModal(confirmModal);
-    });
+    resetStartBtn.addEventListener('click', () => openModal(confirmModal));
 
     resetConfirmBtn.addEventListener('click', () => {
       const fresh = defaultState();
       Object.keys(state).forEach((k) => delete state[k]);
       Object.assign(state, fresh);
       localStorage.removeItem(STORAGE_KEY);
+      hp = getMaxHp();
+      updateHpBar();
       updateHeaderUI();
       updateProfileUI();
       closeModal(confirmModal);
