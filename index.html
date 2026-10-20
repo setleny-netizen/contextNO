@@ -99,13 +99,12 @@
     .page.active { display: flex; flex-direction: column; }
 
     /* ================= ЭКРАН: ЗАРАБОТОК ================= */
-    /* Пункт 1: прижимаем всё к нижнему меню */
+    /* П.1: Вернули по центру */
     .page--earn {
       align-items: center;
-      justify-content: flex-end;
-      gap: 0;
+      justify-content: center;
+      gap: 14px;
       overflow: hidden;
-      padding-bottom: 0;
     }
 
     .iceberg-wrap {
@@ -116,7 +115,6 @@
       transition: transform 0.08s ease;
       -webkit-tap-highlight-color: transparent;
       cursor: pointer;
-      margin-bottom: -6px; /* чуть подсаживаем к нижнему краю */
     }
 
     .iceberg-svg { width: 100%; height: 100%; display: block; pointer-events: auto; overflow: visible; }
@@ -229,7 +227,7 @@
       100% { transform: translate(calc(-50% + cos(var(--angle)) * var(--distance)), calc(-50% + sin(var(--angle)) * var(--distance) + 30px)) scale(0.3); opacity: 0; }
     }
 
-    .hintbar { text-align: center; pointer-events: none; padding-bottom: 4px; }
+    .hintbar { text-align: center; pointer-events: none; }
     .hint-text { font-size: 13px; color: var(--muted); letter-spacing: 0.02em; }
 
     /* ================= ЭКРАН: УЛУЧШЕНИЯ ================= */
@@ -394,6 +392,29 @@
             <stop offset="40%"  stop-color="#E4F1FA"/>
             <stop offset="100%" stop-color="#9FC4DF"/>
           </linearGradient>
+
+          <!-- Градиенты для HP-бара (П.2) -->
+          <linearGradient id="hpFrameGrad" x1="0" y1="0" x2="0" y2="1">
+            <stop offset="0%"   stop-color="#7A7E85"/>
+            <stop offset="20%"  stop-color="#C3C8CF"/>
+            <stop offset="50%"  stop-color="#4D5158"/>
+            <stop offset="80%"  stop-color="#9DA3AB"/>
+            <stop offset="100%" stop-color="#3A3D42"/>
+          </linearGradient>
+          <linearGradient id="hpRedGrad" x1="0" y1="0" x2="0" y2="1">
+            <stop offset="0%"   stop-color="#FF4B4B"/>
+            <stop offset="50%"  stop-color="#E11D1D"/>
+            <stop offset="100%" stop-color="#8A0F0F"/>
+          </linearGradient>
+          <linearGradient id="hpBgGrad" x1="0" y1="0" x2="0" y2="1">
+            <stop offset="0%"   stop-color="#2D1010"/>
+            <stop offset="100%" stop-color="#100404"/>
+          </linearGradient>
+          <linearGradient id="hpCapGrad" x1="0" y1="0" x2="1" y2="1">
+            <stop offset="0%"   stop-color="#D3D7DD"/>
+            <stop offset="50%"  stop-color="#4D5158"/>
+            <stop offset="100%" stop-color="#26282B"/>
+          </linearGradient>
         </defs>
 
         <!-- Свечение -->
@@ -475,13 +496,6 @@
             Q  1650 228   1700 246
             Q  1750 260   1800 244
           " stroke="#FFFFFF" stroke-opacity="0.85" stroke-width="2.5" fill="none"/>
-        </g>
-
-        <!-- ===== HP-бар: отдельный слой над головой (пункт 2) ===== -->
-        <g id="hpBar" pointer-events="none">
-          <rect x="120" y="0" width="160" height="14" rx="7" fill="#1A1A1A" stroke="#1F1F1F" stroke-width="1"/>
-          <rect id="hpFill" x="122" y="2" width="156" height="10" rx="5" fill="#EF4444"/>
-          <text id="hpText" x="200" y="11" text-anchor="middle" font-size="11" font-weight="800" fill="#F2EFE6" font-family="system-ui">100 / 100</text>
         </g>
 
         <!-- ===== СНЕГОВИК ===== -->
@@ -574,6 +588,42 @@
 
         <!-- ===== СЛОЙ ДЛЯ РАЗВАЛИН ===== -->
         <g id="debrisLayer"></g>
+
+        <!-- ===== HP-БАР В СТИЛЕ КАРТИНКИ (П.2) ===== -->
+        <g id="hpBar" pointer-events="none" transform="translate(0, -30)">
+          <!-- Внешняя рамка-каркас -->
+          <rect x="80" y="0" width="240" height="32" rx="6" fill="#1A1A1A" stroke="#0A0A0A" stroke-width="2"/>
+          <!-- Внутренний тёмный фон -->
+          <rect x="88" y="4" width="224" height="24" rx="4" fill="url(#hpBgGrad)" />
+          <!-- Красная полоса здоровья -->
+          <rect id="hpFill" x="88" y="4" width="224" height="24" rx="4" fill="url(#hpRedGrad)"/>
+          <!-- Блик сверху на красной полосе -->
+          <rect x="88" y="5" width="224" height="6" rx="3" fill="#FFFFFF" opacity="0.2" />
+          <!-- Текст с обводкой -->
+          <text id="hpText" x="200" y="21" text-anchor="middle" font-size="16" font-weight="900" fill="#FFFFFF" font-family="system-ui, sans-serif" stroke="#000000" stroke-width="3" paint-order="stroke" letter-spacing="1">100</text>
+
+          <!-- Левая крышка (болты и выступы) -->
+          <path d="M 84 0 C 74 -4, 64 4, 64 16 C 64 28, 74 36, 84 32 L 84 0 Z" fill="url(#hpCapGrad)" stroke="#1A1A1A" stroke-width="1.5"/>
+          <path d="M 78 4 C 72 2, 68 8, 68 16 C 68 24, 72 30, 78 28" fill="none" stroke="#FFFFFF" stroke-opacity="0.3" stroke-width="2"/>
+          <circle cx="76" cy="16" r="3" fill="#1A1A1A" />
+          <circle cx="76" cy="16" r="1.5" fill="#7A7E85" />
+
+          <!-- Правая крышка (болты и выступы) -->
+          <path d="M 316 0 C 326 -4, 336 4, 336 16 C 336 28, 326 36, 316 32 L 316 0 Z" fill="url(#hpCapGrad)" stroke="#1A1A1A" stroke-width="1.5"/>
+          <path d="M 322 4 C 328 2, 332 8, 332 16 C 332 24, 328 30, 322 28" fill="none" stroke="#FFFFFF" stroke-opacity="0.3" stroke-width="2"/>
+          <circle cx="324" cy="16" r="3" fill="#1A1A1A" />
+          <circle cx="324" cy="16" r="1.5" fill="#7A7E85" />
+
+          <!-- Верхние и нижние металлические полосы каркаса -->
+          <rect x="84" y="0" width="232" height="4" rx="2" fill="url(#hpFrameGrad)" />
+          <rect x="84" y="28" width="232" height="4" rx="2" fill="url(#hpFrameGrad)" />
+          <rect x="84" y="4" width="4" height="24" fill="url(#hpFrameGrad)" />
+          <rect x="312" y="4" width="4" height="24" fill="url(#hpFrameGrad)" />
+
+          <!-- Трещинка на правой части (декор) -->
+          <path d="M 300 0 L 296 8 L 302 14 L 298 24 L 302 32" fill="none" stroke="#000000" stroke-width="1.5" opacity="0.6" />
+          <path d="M 300 0 L 296 8 L 302 14 L 298 24 L 302 32" fill="none" stroke="#FFFFFF" stroke-width="0.5" opacity="0.4" transform="translate(1, 0)"/>
+        </g>
       </svg>
     </div>
     <div class="cubes-layer" id="cubesLayer"></div>
@@ -682,12 +732,14 @@
         balance: 0,
         totalEarned: 0,
         totalClicks: 0,
-        totalKills: 0,        // Пункт 4: счётчик убитых снеговиков
-        snowmanIndex: 0,      // текущий номер снеговика (0 -> 100 HP)
+        totalKills: 0,
+        snowmanIndex: 0,
         clickLevels: {},
         passiveLevels: {},
         userName: 'Гость',
         userUsername: '@guest',
+        lastPlayed: Date.now(), // П.4 для оффлайна
+        currentHp: 100,         // П.4 для оффлайна
       };
     }
 
@@ -696,7 +748,10 @@
         const raw = localStorage.getItem(STORAGE_KEY);
         if (!raw) return defaultState();
         const parsed = JSON.parse(raw);
-        return { ...defaultState(), ...parsed };
+        const merged = { ...defaultState(), ...parsed };
+        if (!merged.lastPlayed) merged.lastPlayed = Date.now();
+        if (typeof merged.currentHp !== 'number') merged.currentHp = 100;
+        return merged;
       } catch (e) {
         console.warn('Ошибка загрузки, старт с нуля', e);
         return defaultState();
@@ -705,6 +760,8 @@
 
     function saveState() {
       try {
+        state.lastPlayed = Date.now();
+        state.currentHp = hp;
         localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
       } catch (e) {
         console.warn('Ошибка сохранения', e);
@@ -793,7 +850,7 @@
     const hpText     = document.getElementById('hpText');
     const debrisLayer = document.getElementById('debrisLayer');
 
-    // ---------- HP снеговика (пункт 4: растёт на 10 за каждого) ----------
+    // ---------- HP снеговика ----------
     let hp = 0;
     function getMaxHp() {
       return 100 + 10 * (state.snowmanIndex || 0);
@@ -802,12 +859,12 @@
     function updateHpBar() {
       const maxHp = getMaxHp();
       const pct = Math.max(0, hp) / maxHp;
-      hpFill.setAttribute('width', (156 * pct).toFixed(1));
-      hpText.textContent = `${Math.max(0, Math.ceil(hp))} / ${maxHp}`;
+      hpFill.setAttribute('width', (224 * pct).toFixed(1)); // 224 — ширина внутреннего фона
+      hpText.textContent = Math.max(0, Math.ceil(hp));
     }
 
-    // Инициализируем HP
-    hp = getMaxHp();
+    // Инициализируем HP (учитывая сохранение)
+    hp = state.currentHp;
     updateHpBar();
 
     // ---------- Скролл камеры (сдвиг земли) ----------
@@ -842,7 +899,7 @@
 
       const reward = getClickBonus();
       applyDamage(reward);
-      spawnDmgPop(e.clientX, e.clientY, reward);
+      spawnDmgPop(e.clientX, e.clientY, reward, false);
       spawnCube(e.clientX, e.clientY, reward);
 
       state.totalClicks += 1;
@@ -850,10 +907,19 @@
     });
 
     // ---------- Урон ----------
-    function applyDamage(amount) {
+    function applyDamage(amount, isPassive = false) {
       if (dead) return;
       hp -= amount;
       updateHpBar();
+      
+      if (isPassive) {
+        // Показываем всплывашку пассивного урона (маленькую, без раздувания)
+        const rect = svg.getBoundingClientRect();
+        const cx = rect.left + rect.width * 0.5;
+        const cy = rect.top - 10; // чуть выше бара
+        spawnDmgPop(cx, cy, amount, true);
+      }
+
       if (hp <= 0) {
         hp = 0;
         updateHpBar();
@@ -1024,12 +1090,22 @@
     }
 
     // ---------- Всплывающий урон ----------
-    function spawnDmgPop(x, y, amount) {
+    function spawnDmgPop(x, y, amount, isPassive = false) {
       const el = document.createElement('div');
       el.className = 'dmg-pop';
       el.style.left = x + 'px';
       el.style.top  = y + 'px';
-      el.textContent = '-' + formatNumber(amount);
+      
+      if (isPassive) {
+        // П.3: Тонкая, аккуратная цифра для пассивного урона
+        el.style.fontSize = '12px';
+        el.style.color = '#FFA3A3';
+        el.style.opacity = '0.8';
+        el.textContent = '-' + formatNumber(amount);
+      } else {
+        el.textContent = '-' + formatNumber(amount);
+      }
+      
       document.body.appendChild(el);
       setTimeout(() => el.remove(), 600);
     }
@@ -1080,19 +1156,92 @@
       });
     }
 
-    // ---------- Пассивный доход (пункт 3: тоже наносит урон) ----------
+    // ---------- П.3: Плавный пассивный урон ----------
+    let lastPassiveTick = performance.now();
     setInterval(() => {
       const income = getPassiveBonus();
       if (income > 0) {
-        state.balance += income;
-        state.totalEarned += income;
+        // Начисляем доход (распределённо)
+        state.balance += income / 20;
+        state.totalEarned += income / 20;
         updateHeaderUI();
         saveState();
 
-        // Наносим урон пассивкой
-        applyDamage(income);
+        // Наносим урон
+        applyDamage(income / 20, true);
       }
-    }, 1000);
+    }, 50); // 20 раз в секунду = 50 мс
+
+    // ---------- П.4: Оффлайн-урон (вне игры) ----------
+    function processOfflineProgress() {
+      const now = Date.now();
+      const last = state.lastPlayed || now;
+      const diffMs = now - last;
+      
+      // Если прошло меньше 5 секунд, ничего не делаем
+      if (diffMs < 5000) return;
+
+      const income = getPassiveBonus();
+      if (income <= 0) return;
+
+      // Отнимаем урон, накопленный за это время (максимум 24 часа, чтобы не улететь в минус)
+      const offlineSeconds = Math.min(diffMs / 1000, 24 * 3600);
+      let totalDamage = income * offlineSeconds;
+      
+      // Начисляем баланс за оффлайн
+      const offlineEarned = income * offlineSeconds;
+      state.balance += offlineEarned;
+      state.totalEarned += offlineEarned;
+
+      // Прокручиваем убийства снеговиков
+      while (totalDamage > 0) {
+        // Если снеговик сейчас мертв (в процессе анимации), пропускаем урон
+        if (dead) {
+          // Искусственно сбрасываем анимацию (без визуалки)
+          hp = getMaxHp();
+          updateHpBar();
+          state.snowmanIndex++;
+          state.totalKills = (state.totalKills || 0) + 1;
+          continue;
+        }
+
+        if (totalDamage >= hp) {
+          // Убиваем
+          totalDamage -= hp;
+          state.snowmanIndex++;
+          state.totalKills = (state.totalKills || 0) + 1;
+          hp = getMaxHp();
+        } else {
+          // Наносим остаточный урон
+          hp -= totalDamage;
+          totalDamage = 0;
+        }
+      }
+
+      // Обновляем визуал
+      updateHpBar();
+      updateHeaderUI();
+      saveState();
+
+      // Если HP <= 0 (не должно случиться, но на всякий)
+      if (hp <= 0) {
+        hp = getMaxHp();
+        updateHpBar();
+      }
+    }
+
+    // Запуск при старте
+    processOfflineProgress();
+
+    // Отслеживаем возврат на вкладку
+    document.addEventListener('visibilitychange', () => {
+      if (document.visibilityState === 'visible') {
+        processOfflineProgress();
+        saveState(); // Обновляем lastPlayed
+      } else {
+        saveState(); // Сохраняем при уходе
+      }
+    });
 
     // ---------- Навигация ----------
     const navButtons = document.querySelectorAll('.nav-btn');
@@ -1212,6 +1361,8 @@
       Object.keys(state).forEach((k) => delete state[k]);
       Object.assign(state, fresh);
       localStorage.removeItem(STORAGE_KEY);
+      
+      // Сброс визуала
       hp = getMaxHp();
       updateHpBar();
       updateHeaderUI();
@@ -1222,6 +1373,11 @@
     // ---------- Инициализация ----------
     updateHeaderUI();
     renderUpgrades();
+    updateProfileUI();
+
+    // Регулярное сохранение, чтобы lastPlayed обновлялся
+    setInterval(saveState, 5000);
+
   </script>
 </body>
 </html>
