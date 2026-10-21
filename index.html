@@ -127,7 +127,6 @@
       justify-content: center;
     }
 
-    /* Стили для картинки монстра */
     .monster-img {
       width: 100%;
       height: 100%;
@@ -135,7 +134,6 @@
       pointer-events: none;
       transition: transform 0.1s;
       filter: drop-shadow(0 10px 20px rgba(0,0,0,0.5));
-      /* Защита от перетаскивания */
       user-drag: none; 
       user-select: none;
       -moz-user-select: none;
@@ -449,18 +447,18 @@
 </head>
 <body>
 
-  <!-- Скрытая предзагрузка картинок (все ваши файлы) -->
+  <!-- Скрытая предзагрузка картинок (русские названия) -->
   <div class="preload-images">
-    <img src="monster1.png" alt="">
-    <img src="monster2.png" alt="">
-    <img src="monster3.png" alt="">
-    <img src="character.png" alt="">
-    <img src="helmet.png" alt="">
-    <img src="weapon.png" alt="">
-    <img src="accessory.png" alt="">
-    <img src="cape.png" alt="">
-    <img src="armor.png" alt="">
-    <img src="pet.png" alt="">
+    <img src="монстр1.png" alt="">
+    <img src="монстр2.png" alt="">
+    <img src="монстр3.png" alt="">
+    <img src="персонаж.png" alt="">
+    <img src="шлем.png" alt="">
+    <img src="оружие.png" alt="">
+    <img src="акссесуар.png" alt="">
+    <img src="плащ.png" alt="">
+    <img src="броня.png" alt="">
+    <img src="питомец.png" alt="">
   </div>
 
   <!-- ШАПКА -->
@@ -520,7 +518,7 @@
   <!-- ЭКРАН: ЗАРАБОТОК -->
   <main class="page page--earn active" id="page-earn">
     <div class="monster-wrap" id="monsterWrap">
-      <img src="monster1.png" id="monsterImg" class="monster-img" alt="Монстр" draggable="false">
+      <img src="монстр1.png" id="monsterImg" class="monster-img" alt="Монстр" draggable="false">
     </div>
     
     <div class="hp-bar-container" id="hpBarContainer">
@@ -543,36 +541,36 @@
       <!-- ЛЕВАЯ КОЛОНКА -->
       <div class="upgrades-col">
         <div class="item-slot" id="item-helmet" data-id="helmet">
-          <img src="helmet.png" class="item-slot__img" alt="Шлем" draggable="false">
+          <img src="шлем.png" class="item-slot__img" alt="Шлем" draggable="false">
           <span class="item-slot__lvl">Ур. 1</span>
         </div>
         <div class="item-slot" id="item-weapon" data-id="weapon">
-          <img src="weapon.png" class="item-slot__img" alt="Оружие" draggable="false">
+          <img src="оружие.png" class="item-slot__img" alt="Оружие" draggable="false">
           <span class="item-slot__lvl">Ур. 1</span>
         </div>
         <div class="item-slot" id="item-accessory" data-id="accessory">
-          <img src="accessory.png" class="item-slot__img" alt="Аксессуар" draggable="false">
+          <img src="акссесуар.png" class="item-slot__img" alt="Аксессуар" draggable="false">
           <span class="item-slot__lvl">Ур. 1</span>
         </div>
       </div>
 
       <!-- ЦЕНТР -->
       <div class="character-center">
-        <img src="character.png" class="character-center__img" alt="Персонаж" draggable="false">
+        <img src="персонаж.png" class="character-center__img" alt="Персонаж" draggable="false">
       </div>
 
       <!-- ПРАВАЯ КОЛОНКА -->
       <div class="upgrades-col">
         <div class="item-slot" id="item-cape" data-id="cape">
-          <img src="cape.png" class="item-slot__img" alt="Плащ" draggable="false">
+          <img src="плащ.png" class="item-slot__img" alt="Плащ" draggable="false">
           <span class="item-slot__lvl">Ур. 1</span>
         </div>
         <div class="item-slot" id="item-armor" data-id="armor">
-          <img src="armor.png" class="item-slot__img" alt="Броня" draggable="false">
+          <img src="броня.png" class="item-slot__img" alt="Броня" draggable="false">
           <span class="item-slot__lvl">Ур. 1</span>
         </div>
         <div class="item-slot" id="item-pet" data-id="pet">
-          <img src="pet.png" class="item-slot__img" alt="Питомец" draggable="false">
+          <img src="питомец.png" class="item-slot__img" alt="Питомец" draggable="false">
           <span class="item-slot__lvl">Ур. 1</span>
         </div>
       </div>
@@ -675,7 +673,6 @@
   <script>
     const STORAGE_KEY = 'lohmaty_club_state_v2';
 
-    // СПИСОК ПРЕДМЕТОВ (с добавленными описаниями)
     const ITEMS = {
       helmet:    { name: 'Шлем',      bonus: 1, basePrice: 50, desc: 'Глубокий капюшон с меховой опушкой. Скрывает лицо, позволяя видеть в непроглядной тьме.' },
       weapon:    { name: 'Оружие',    bonus: 1, basePrice: 50, desc: 'Тяжелый ритуальный топор с рунной вязью. Раскалывает не только преграду, но и суть врага.' },
@@ -783,7 +780,6 @@
     const hpText     = document.getElementById('hpText');
     const hpBarContainer = document.getElementById('hpBarContainer');
 
-    // НАДЕЖНАЯ ЗАГРУЗКА КАРТИНОК
     const FALLBACK_MONSTER = 'data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" fill="%232A2A2A"><circle cx="50" cy="50" r="40" stroke="%23C9A227" stroke-width="4"/><text x="50" y="55" font-size="20" fill="%23C9A227" text-anchor="middle" font-family="sans-serif" font-weight="bold">?</text></svg>';
     const FALLBACK_ITEM = 'data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" fill="%231A1A1A"><rect x="10" y="10" width="80" height="80" rx="10" stroke="%23C9A227" stroke-width="4"/></svg>';
     const FALLBACK_CHAR = 'data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" fill="%23141414"><rect width="100" height="100"/></svg>';
@@ -817,9 +813,9 @@
     function updateMonsterImage() {
       const type = (state.monsterIndex || 0) % 3;
       const monsters = [
-        'monster1.png', 
-        'monster2.png', 
-        'monster3.png' 
+        'монстр1.png', 
+        'монстр2.png', 
+        'монстр3.png' 
       ];
       monsterImg.src = monsters[type];
     }
