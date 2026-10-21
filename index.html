@@ -112,13 +112,15 @@
       justify-content: center;
       gap: 14px;
       overflow: hidden;
+      /* Темно-серый градиент на фоне */
+      background: radial-gradient(circle at center 60%, #1A1A1A 0%, #0A0A0A 60%);
     }
 
     /* Обертка для сцены (монстр + снег) */
     .scene-wrap {
       position: relative;
       width: 100%;
-      max-width: 400px;
+      max-width: 500px;
       height: 350px;
       display: flex;
       flex-direction: column;
@@ -138,7 +140,7 @@
       display: flex;
       align-items: center;
       justify-content: center;
-      margin-bottom: -40px; /* Немного опускаем в снег */
+      margin-bottom: -40px;
     }
 
     .monster-img {
@@ -147,7 +149,7 @@
       object-fit: contain;
       pointer-events: none;
       transition: transform 0.1s;
-      filter: drop-shadow(0 10px 20px rgba(0,0,0,0.5));
+      filter: drop-shadow(0 10px 20px rgba(0,0,0,0.8));
       user-drag: none; user-select: none; -webkit-user-drag: none;
     }
 
@@ -161,16 +163,30 @@
       100% { transform: translateY(0) scale(1); }
     }
 
-    /* Снежная дорога (SVG) */
+    /* Бесконечная снежная дорога */
     .snow-ground {
       position: absolute;
       bottom: 0;
-      left: -50%;
-      width: 200%;
+      left: 0;
+      width: 100%;
       height: 120px;
       z-index: 1;
       pointer-events: none;
-      transition: transform 0.55s cubic-bezier(.6,.05,.3,1);
+      overflow: hidden;
+    }
+
+    .snow-ground-inner {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 200%;
+      height: 100%;
+      animation: scrollSnow 10s linear infinite;
+    }
+
+    @keyframes scrollSnow {
+      0% { transform: translateX(0); }
+      100% { transform: translateX(-50%); }
     }
 
     /* HP-бар */
@@ -280,71 +296,111 @@
     .hintbar { text-align: center; pointer-events: none; margin-top: -10px; }
     .hint-text { font-size: 13px; color: var(--muted); letter-spacing: 0.02em; }
 
-    /* ================= ЭКРАН: УЛУЧШЕНИЯ ================= */
+    /* ================= ЭКРАН: УЛУЧШЕНИЯ (КАК НА КАРТИНКЕ) ================= */
+    .page--upgrades {
+      padding: 10px 12px;
+      background: #0A0A0A;
+    }
+
     .upgrades-container {
       display: flex;
       justify-content: space-between;
       align-items: center;
       width: 100%;
       height: 100%;
-      padding: 10px 0;
     }
 
     .upgrades-col {
       display: flex;
       flex-direction: column;
-      gap: 12px;
-      width: 80px;
+      gap: 10px;
+      width: 90px;
+      z-index: 2;
     }
 
     .item-slot {
-      width: 80px;
-      height: 100px;
-      background: var(--card-2);
-      border: 2px solid var(--border);
+      width: 90px;
+      height: 110px;
+      background: #E5E5E5; /* Светлый фон как на референсе */
+      border: 3px solid #A0A0A0;
       border-radius: 12px;
       display: flex;
       flex-direction: column;
       align-items: center;
-      justify-content: center;
+      justify-content: space-between;
       cursor: pointer;
       position: relative;
       transition: border-color 0.2s, transform 0.1s;
+      padding: 4px;
     }
 
     .item-slot:active { transform: scale(0.95); }
-    .item-slot.active { border-color: var(--gold-2); box-shadow: 0 0 15px rgba(212,175,55,0.3); }
+    
+    /* Цвета обводок как на картинке */
+    .item-slot.active { 
+      border-color: #8A2BE2; 
+      box-shadow: 0 0 15px rgba(138, 43, 226, 0.4); 
+    }
+    .item-slot.legendary { border-color: #D4AF37; }
+    .item-slot.legendary.active { 
+      border-color: #FFD700; 
+      box-shadow: 0 0 20px rgba(255, 215, 0, 0.5); 
+    }
 
     .item-slot__img {
       width: 60px;
       height: 60px;
       object-fit: contain;
-      margin-bottom: 4px;
+      margin-top: 4px;
     }
 
-    .item-slot__lvl {
-      font-size: 10px;
-      font-weight: 700;
-      color: var(--cream);
-      background: rgba(0,0,0,0.6);
+    .item-slot__stars {
+      display: flex;
+      gap: 2px;
+      background: #333;
       padding: 2px 6px;
       border-radius: 4px;
+      margin-bottom: 2px;
+    }
+    
+    .item-slot__stars svg { width: 10px; height: 10px; fill: #D4AF37; }
+
+    .item-slot__lvl {
+      font-size: 11px;
+      font-weight: 700;
+      color: #333;
+      text-align: center;
     }
 
     /* Центральный персонаж */
     .character-center {
       flex: 1;
       display: flex;
+      align-items: center;
+      justify-content: center;
+      z-index: 1;
+    }
+
+    .character-card {
+      width: 90%;
+      max-width: 220px;
+      height: 85%;
+      max-height: 500px;
+      background: #F2EFE6;
+      border-radius: 24px;
+      display: flex;
       flex-direction: column;
       align-items: center;
       justify-content: center;
+      box-shadow: 0 10px 30px rgba(0,0,0,0.8);
+      border: 2px solid #CCC;
+      padding: 10px;
     }
 
     .character-center__img {
       width: 100%;
-      max-width: 160px;
+      height: 100%;
       object-fit: contain;
-      filter: drop-shadow(0 10px 20px rgba(0,0,0,0.6));
       user-drag: none; user-select: none; -webkit-user-drag: none;
     }
 
@@ -524,37 +580,46 @@
   <main class="page page--earn active" id="page-earn">
     
     <div class="scene-wrap">
-      <!-- Снежная дорога -->
-      <svg class="snow-ground" id="snowGround" viewBox="0 0 800 120" preserveAspectRatio="none" xmlns="http://www.w3.org/2000/svg">
-        <defs>
-          <linearGradient id="driftGrad" x1="0" y1="0" x2="0" y2="1">
-            <stop offset="0%"   stop-color="#FFFFFF"/>
-            <stop offset="40%"  stop-color="#E4F1FA"/>
-            <stop offset="100%" stop-color="#9FC4DF"/>
-          </linearGradient>
-        </defs>
-        <!-- Нижняя глубина -->
-        <rect x="0" y="60" width="800" height="60" fill="#9FC4DF" opacity="0.55"/>
-        <!-- Сугробы -->
-        <path d="
-          M 0 60 Q 50 40 100 55 Q 150 70 200 55 Q 250 40 300 55 Q 350 70 400 55
-          Q 450 40 500 55 Q 550 70 600 55 Q 650 40 700 55 Q 750 70 800 55
-          L 800 120 L 0 120 Z
-        " fill="url(#driftGrad)"/>
-        <!-- Блик -->
-        <path d="
-          M 0 60 Q 50 40 100 55 Q 150 70 200 55 Q 250 40 300 55 Q 350 70 400 55
-          Q 450 40 500 55 Q 550 70 600 55 Q 650 40 700 55 Q 750 70 800 55
-        " stroke="#FFFFFF" stroke-opacity="0.85" stroke-width="3" fill="none"/>
-        <!-- Снежинки на земле -->
-        <g fill="#FFFFFF" opacity="0.7">
-          <circle cx="50" cy="80" r="2.5"/><circle cx="120" cy="90" r="1.8"/>
-          <circle cx="200" cy="85" r="2.2"/><circle cx="280" cy="95" r="1.5"/>
-          <circle cx="350" cy="78" r="2.8"/><circle cx="430" cy="88" r="2.0"/>
-          <circle cx="510" cy="92" r="1.7"/><circle cx="600" cy="82" r="2.4"/>
-          <circle cx="680" cy="95" r="1.9"/><circle cx="750" cy="80" r="2.6"/>
-        </g>
-      </svg>
+      <!-- Бесконечная снежная дорога -->
+      <div class="snow-ground">
+        <div class="snow-ground-inner">
+          <svg viewBox="0 0 1600 120" preserveAspectRatio="none" width="100%" height="100%" xmlns="http://www.w3.org/2000/svg">
+            <defs>
+              <linearGradient id="driftGrad" x1="0" y1="0" x2="0" y2="1">
+                <stop offset="0%"   stop-color="#FFFFFF"/>
+                <stop offset="40%"  stop-color="#E4F1FA"/>
+                <stop offset="100%" stop-color="#9FC4DF"/>
+              </linearGradient>
+            </defs>
+            <rect x="0" y="60" width="1600" height="60" fill="#9FC4DF" opacity="0.55"/>
+            <path d="
+              M 0 60 Q 50 40 100 55 Q 150 70 200 55 Q 250 40 300 55 Q 350 70 400 55
+              Q 450 40 500 55 Q 550 70 600 55 Q 650 40 700 55 Q 750 70 800 55
+              Q 850 40 900 55 Q 950 70 1000 55 Q 1050 40 1100 55 Q 1150 70 1200 55
+              Q 1250 40 1300 55 Q 1350 70 1400 55 Q 1450 40 1500 55 Q 1550 70 1600 55
+              L 1600 120 L 0 120 Z
+            " fill="url(#driftGrad)"/>
+            <path d="
+              M 0 60 Q 50 40 100 55 Q 150 70 200 55 Q 250 40 300 55 Q 350 70 400 55
+              Q 450 40 500 55 Q 550 70 600 55 Q 650 40 700 55 Q 750 70 800 55
+              Q 850 40 900 55 Q 950 70 1000 55 Q 1050 40 1100 55 Q 1150 70 1200 55
+              Q 1250 40 1300 55 Q 1350 70 1400 55 Q 1450 40 1500 55 Q 1550 70 1600 55
+            " stroke="#FFFFFF" stroke-opacity="0.85" stroke-width="3" fill="none"/>
+            <g fill="#FFFFFF" opacity="0.7">
+              <circle cx="50" cy="80" r="2.5"/><circle cx="120" cy="90" r="1.8"/>
+              <circle cx="200" cy="85" r="2.2"/><circle cx="280" cy="95" r="1.5"/>
+              <circle cx="350" cy="78" r="2.8"/><circle cx="430" cy="88" r="2.0"/>
+              <circle cx="510" cy="92" r="1.7"/><circle cx="600" cy="82" r="2.4"/>
+              <circle cx="680" cy="95" r="1.9"/><circle cx="750" cy="80" r="2.6"/>
+              <circle cx="850" cy="88" r="2.1"/><circle cx="920" cy="95" r="1.6"/>
+              <circle cx="1000" cy="82" r="2.7"/><circle cx="1080" cy="90" r="1.9"/>
+              <circle cx="1150" cy="78" r="2.3"/><circle cx="1250" cy="88" r="2.5"/>
+              <circle cx="1350" cy="95" r="1.8"/><circle cx="1450" cy="82" r="2.2"/>
+              <circle cx="1550" cy="90" r="2.0"/>
+            </g>
+          </svg>
+        </div>
+      </div>
 
       <!-- Монстр -->
       <div class="monster-wrap" id="monsterWrap">
@@ -576,44 +641,82 @@
     </div>
   </main>
 
-  <!-- ЭКРАН: УЛУЧШЕНИЯ -->
-  <main class="page" id="page-upgrades" style="position: relative;">
+  <!-- ЭКРАН: УЛУЧШЕНИЯ (КАК НА КАРТИНКЕ №2) -->
+  <main class="page page--upgrades" id="page-upgrades" style="position: relative;">
     
     <div class="upgrades-container">
       <!-- ЛЕВАЯ КОЛОНКА -->
       <div class="upgrades-col">
-        <div class="item-slot" id="item-helmet" data-id="helmet">
+        <!-- Шлем (Фиолетовый) -->
+        <div class="item-slot" id="item-helmet" data-id="helmet" style="border-color: #8A2BE2;">
           <img src="шлем.png" class="item-slot__img" alt="Шлем" draggable="false">
-          <span class="item-slot__lvl">Ур. 1</span>
+          <div class="item-slot__stars">
+            <svg viewBox="0 0 24 24"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
+            <svg viewBox="0 0 24 24"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
+            <svg viewBox="0 0 24 24"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
+          </div>
+          <span class="item-slot__lvl">Ур. 50</span>
         </div>
-        <div class="item-slot" id="item-weapon" data-id="weapon">
+        <!-- Оружие (Золотой) -->
+        <div class="item-slot legendary" id="item-weapon" data-id="weapon">
           <img src="оружие.png" class="item-slot__img" alt="Оружие" draggable="false">
-          <span class="item-slot__lvl">Ур. 1</span>
+          <div class="item-slot__stars">
+            <svg viewBox="0 0 24 24"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
+            <svg viewBox="0 0 24 24"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
+            <svg viewBox="0 0 24 24"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
+          </div>
+          <span class="item-slot__lvl">Ур. 50</span>
         </div>
-        <div class="item-slot" id="item-accessory" data-id="accessory">
+        <!-- Аксессуар (Золотой) -->
+        <div class="item-slot legendary" id="item-accessory" data-id="accessory">
           <img src="акссесуар.png" class="item-slot__img" alt="Аксессуар" draggable="false">
-          <span class="item-slot__lvl">Ур. 1</span>
+          <div class="item-slot__stars">
+            <svg viewBox="0 0 24 24"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
+            <svg viewBox="0 0 24 24"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
+            <svg viewBox="0 0 24 24"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
+          </div>
+          <span class="item-slot__lvl">Ур. 50</span>
         </div>
       </div>
 
-      <!-- ЦЕНТР -->
+      <!-- ЦЕНТР (Персонаж) -->
       <div class="character-center">
-        <img src="персонаж.png" class="character-center__img" alt="Персонаж" draggable="false">
+        <div class="character-card">
+          <img src="персонаж.png" class="character-center__img" alt="Персонаж" draggable="false">
+        </div>
       </div>
 
       <!-- ПРАВАЯ КОЛОНКА -->
       <div class="upgrades-col">
-        <div class="item-slot" id="item-cape" data-id="cape">
+        <!-- Плащ (Синий/Серебряный) -->
+        <div class="item-slot" id="item-cape" data-id="cape" style="border-color: #5DADE2;">
           <img src="плащ.png" class="item-slot__img" alt="Плащ" draggable="false">
-          <span class="item-slot__lvl">Ур. 1</span>
+          <div class="item-slot__stars">
+            <svg viewBox="0 0 24 24"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
+            <svg viewBox="0 0 24 24"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
+            <svg viewBox="0 0 24 24"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
+          </div>
+          <span class="item-slot__lvl">Ур. 50</span>
         </div>
-        <div class="item-slot" id="item-armor" data-id="armor">
+        <!-- Броня (Фиолетовый) -->
+        <div class="item-slot" id="item-armor" data-id="armor" style="border-color: #8A2BE2;">
           <img src="броня.png" class="item-slot__img" alt="Броня" draggable="false">
-          <span class="item-slot__lvl">Ур. 1</span>
+          <div class="item-slot__stars">
+            <svg viewBox="0 0 24 24"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
+            <svg viewBox="0 0 24 24"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
+            <svg viewBox="0 0 24 24"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
+          </div>
+          <span class="item-slot__lvl">Ур. 50</span>
         </div>
-        <div class="item-slot" id="item-pet" data-id="pet">
+        <!-- Питомец (Серебряный) -->
+        <div class="item-slot" id="item-pet" data-id="pet" style="border-color: #BDC3C7;">
           <img src="питомец.png" class="item-slot__img" alt="Питомец" draggable="false">
-          <span class="item-slot__lvl">Ур. 1</span>
+          <div class="item-slot__stars">
+            <svg viewBox="0 0 24 24"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
+            <svg viewBox="0 0 24 24"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
+            <svg viewBox="0 0 24 24"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
+          </div>
+          <span class="item-slot__lvl">Ур. 50</span>
         </div>
       </div>
     </div>
@@ -714,21 +817,12 @@
 
   <script>
     // === ПРЕЛОАД КАРТИНОК ===
-    // Этот блок принудительно загружает все картинки в кэш браузера еще до старта игры
     const imagesToPreload = [
       'монстр1.png', 'монстр2.png', 'монстр3.png', 'персонаж.png',
       'шлем.png', 'оружие.png', 'акссесуар.png', 'плащ.png', 'броня.png', 'питомец.png'
     ];
-    let loadedImagesCount = 0;
     imagesToPreload.forEach(src => {
       const img = new Image();
-      img.onload = () => {
-        loadedImagesCount++;
-      };
-      img.onerror = () => {
-        console.warn('Не удалось загрузить: ' + src);
-        loadedImagesCount++;
-      };
       img.src = src;
     });
 
@@ -837,13 +931,11 @@
     // ======================== ЭКРАН ЗАРАБОТКА ========================
     const wrap  = document.getElementById('monsterWrap');
     const monsterImg = document.getElementById('monsterImg');
-    const snowGround = document.getElementById('snowGround');
     const layer = document.getElementById('cubesLayer');
     const hpFill     = document.getElementById('hpFill');
     const hpText     = document.getElementById('hpText');
     const hpBarContainer = document.getElementById('hpBarContainer');
 
-    // Фолбэки
     const FALLBACK_MONSTER = 'data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" fill="%232A2A2A"><circle cx="50" cy="50" r="40" stroke="%23C9A227" stroke-width="4"/><text x="50" y="55" font-size="20" fill="%23C9A227" text-anchor="middle" font-family="sans-serif" font-weight="bold">?</text></svg>';
     const FALLBACK_ITEM = 'data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" fill="%231A1A1A"><rect x="10" y="10" width="80" height="80" rx="10" stroke="%23C9A227" stroke-width="4"/></svg>';
     const FALLBACK_CHAR = 'data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" fill="%23141414"><rect width="100" height="100"/></svg>';
@@ -947,13 +1039,6 @@
       state.monsterIndex = (state.monsterIndex || 0) + 1;
       saveState();
 
-      // Анимация сдвига земли влево
-      snowGround.style.transition = 'none';
-      snowGround.style.transform = 'translateX(0)';
-      void snowGround.offsetWidth;
-      snowGround.style.transition = 'transform 0.55s cubic-bezier(.6,.05,.3,1)';
-      snowGround.style.transform = 'translateX(-50%)'; // Сдвигаем дорогу
-
       setTimeout(() => {
         hp = getMaxHp();
         updateHpBar();
@@ -962,10 +1047,6 @@
         monsterImg.style.transition = 'none';
         monsterImg.style.opacity = '0';
         monsterImg.style.transform = 'scale(0.8) translateX(100px)';
-
-        // Возвращаем землю обратно
-        snowGround.style.transition = 'none';
-        snowGround.style.transform = 'translateX(0)';
 
         requestAnimationFrame(() => {
           monsterImg.style.transition = 'opacity 0.4s, transform 0.4s';
@@ -1143,7 +1224,7 @@
       Object.keys(ITEMS).forEach(id => {
         const lvl = state.itemLevels[id] || 1;
         const el = document.querySelector(`.item-slot[data-id="${id}"] .item-slot__lvl`);
-        if (el) el.textContent = `Ур. ${lvl}`;
+        if (el) el.textContent = `Ур. ${lvl}`; // Оставляем реальный уровень, но визуально оформлено как на картинке
       });
       if (activeItemId) openItemPanel(activeItemId);
     }
