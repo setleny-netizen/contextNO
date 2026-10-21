@@ -294,8 +294,8 @@
     .item-slot.active { border-color: var(--gold-2); box-shadow: 0 0 15px rgba(212,175,55,0.3); }
 
     .item-slot__img {
-      width: 50px;
-      height: 50px;
+      width: 60px;
+      height: 60px;
       object-fit: contain;
       margin-bottom: 4px;
     }
@@ -320,7 +320,7 @@
 
     .character-center__img {
       width: 100%;
-      max-width: 180px;
+      max-width: 160px;
       object-fit: contain;
       filter: drop-shadow(0 10px 20px rgba(0,0,0,0.6));
       user-drag: none; user-select: none; -webkit-user-drag: none;
@@ -359,15 +359,16 @@
     }
 
     .panel-info__desc {
-      font-size: 12px;
+      font-size: 11px;
       color: var(--muted);
+      line-height: 1.3;
+      margin-bottom: 4px;
     }
 
     .panel-info__stats {
       font-size: 12px;
       color: var(--gold-2);
       font-weight: 600;
-      margin-top: 4px;
     }
 
     .buy-btn {
@@ -385,6 +386,7 @@
       font-weight: 800;
       cursor: pointer;
       transition: background 0.15s, opacity 0.15s;
+      flex-shrink: 0;
     }
 
     .buy-btn:hover:not(:disabled) { background: var(--gold-2); }
@@ -447,9 +449,8 @@
 </head>
 <body>
 
-  <!-- Скрытая предзагрузка картинок -->
+  <!-- Скрытая предзагрузка картинок (все ваши файлы) -->
   <div class="preload-images">
-    <!-- ВСТАВЬТЕ СЮДА ВСЕ ВАШИ ПУТИ К КАРТИНКАМ -->
     <img src="monster1.png" alt="">
     <img src="monster2.png" alt="">
     <img src="monster3.png" alt="">
@@ -519,7 +520,6 @@
   <!-- ЭКРАН: ЗАРАБОТОК -->
   <main class="page page--earn active" id="page-earn">
     <div class="monster-wrap" id="monsterWrap">
-      <!-- onerror подставит заглушку, если файл не найден -->
       <img src="monster1.png" id="monsterImg" class="monster-img" alt="Монстр" draggable="false">
     </div>
     
@@ -582,8 +582,8 @@
     <div class="upgrade-bottom-panel" id="upgradePanel">
       <div class="panel-info">
         <div class="panel-info__name" id="panelName">Шлем</div>
-        <div class="panel-info__desc" id="panelDesc">Увеличивает урон за клик и в секунду.</div>
-        <div class="panel-info__stats" id="panelStats">Уровень: 1 (+1 урона)</div>
+        <div class="panel-info__desc" id="panelDesc">Описание</div>
+        <div class="panel-info__stats" id="panelStats">Уровень: 1</div>
       </div>
       <button class="buy-btn" id="buyBtn">
         Улучшить
@@ -675,14 +675,14 @@
   <script>
     const STORAGE_KEY = 'lohmaty_club_state_v2';
 
-    // СПИСОК ПРЕДМЕТОВ
+    // СПИСОК ПРЕДМЕТОВ (с добавленными описаниями)
     const ITEMS = {
-      helmet:    { name: 'Шлем',      bonus: 1, basePrice: 50 },
-      weapon:    { name: 'Оружие',    bonus: 1, basePrice: 50 },
-      accessory: { name: 'Аксессуар', bonus: 1, basePrice: 50 },
-      cape:      { name: 'Плащ',      bonus: 1, basePrice: 50 },
-      armor:     { name: 'Броня',     bonus: 1, basePrice: 50 },
-      pet:       { name: 'Питомец',   bonus: 1, basePrice: 50 }
+      helmet:    { name: 'Шлем',      bonus: 1, basePrice: 50, desc: 'Глубокий капюшон с меховой опушкой. Скрывает лицо, позволяя видеть в непроглядной тьме.' },
+      weapon:    { name: 'Оружие',    bonus: 1, basePrice: 50, desc: 'Тяжелый ритуальный топор с рунной вязью. Раскалывает не только преграду, но и суть врага.' },
+      accessory: { name: 'Аксессуар', bonus: 1, basePrice: 50, desc: 'Кованый кулон с сапфировым древом. Питает владельца силой увядших миров.' },
+      cape:      { name: 'Плащ',      bonus: 1, basePrice: 50, desc: 'Рваная накидка из шкур и перьев, увешанная тяжелыми цепями. Сливает владельца с метелью.' },
+      armor:     { name: 'Броня',     bonus: 1, basePrice: 50, desc: 'Кожаный доспех с массивными пряжками. Защищает от сокрушительных ударов и скрывает трофеи.' },
+      pet:       { name: 'Питомец',   bonus: 1, basePrice: 50, desc: 'Древний зверь с глазами цвета северного сияния. Его ледяное дыхание замораживает плоть.' }
     };
 
     function defaultState() {
@@ -783,12 +783,11 @@
     const hpText     = document.getElementById('hpText');
     const hpBarContainer = document.getElementById('hpBarContainer');
 
-    // НАДЕЖНАЯ ЗАГРУЗКА КАРТИНОК (если файла нет - ставим заглушку)
+    // НАДЕЖНАЯ ЗАГРУЗКА КАРТИНОК
     const FALLBACK_MONSTER = 'data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" fill="%232A2A2A"><circle cx="50" cy="50" r="40" stroke="%23C9A227" stroke-width="4"/><text x="50" y="55" font-size="20" fill="%23C9A227" text-anchor="middle" font-family="sans-serif" font-weight="bold">?</text></svg>';
     const FALLBACK_ITEM = 'data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" fill="%231A1A1A"><rect x="10" y="10" width="80" height="80" rx="10" stroke="%23C9A227" stroke-width="4"/></svg>';
     const FALLBACK_CHAR = 'data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" fill="%23141414"><rect width="100" height="100"/></svg>';
 
-    // Вешаем onerror на все картинки, чтобы они не ломались
     document.querySelectorAll('img').forEach(img => {
       img.onerror = function() {
         if (this.classList.contains('monster-img')) {
@@ -798,7 +797,7 @@
         } else if (this.classList.contains('character-center__img')) {
           this.src = FALLBACK_CHAR;
         } else {
-          this.style.display = 'none'; // Скрываем битые картинки в предзагрузке
+          this.style.display = 'none';
         }
       };
     });
@@ -1064,6 +1063,7 @@
     // ======================== ЭКРАН УЛУЧШЕНИЙ ========================
     const upgradePanel = document.getElementById('upgradePanel');
     const panelName    = document.getElementById('panelName');
+    const panelDesc    = document.getElementById('panelDesc');
     const panelStats   = document.getElementById('panelStats');
     const buyBtn       = document.getElementById('buyBtn');
     const buyPrice     = document.getElementById('buyPrice');
@@ -1089,6 +1089,7 @@
       const price = getUpgradePrice(id);
       
       panelName.textContent = ITEMS[id].name;
+      panelDesc.textContent = ITEMS[id].desc;
       panelStats.textContent = `Уровень: ${lvl} (+${lvl} урона)`;
       buyPrice.textContent = formatNumber(price);
 
