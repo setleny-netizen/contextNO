@@ -114,17 +114,31 @@
       overflow: hidden;
     }
 
+    /* Обертка для сцены (монстр + снег) */
+    .scene-wrap {
+      position: relative;
+      width: 100%;
+      max-width: 400px;
+      height: 350px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: flex-end;
+      overflow: hidden;
+    }
+
+    /* Монстр */
     .monster-wrap {
       position: relative;
-      width: 300px;
-      height: 300px;
-      flex-shrink: 0;
+      width: 280px;
+      height: 280px;
+      z-index: 2;
       transition: transform 0.08s ease;
-      -webkit-tap-highlight-color: transparent;
       cursor: pointer;
       display: flex;
       align-items: center;
       justify-content: center;
+      margin-bottom: -40px; /* Немного опускаем в снег */
     }
 
     .monster-img {
@@ -134,10 +148,7 @@
       pointer-events: none;
       transition: transform 0.1s;
       filter: drop-shadow(0 10px 20px rgba(0,0,0,0.5));
-      user-drag: none; 
-      user-select: none;
-      -moz-user-select: none;
-      -webkit-user-drag: none;
+      user-drag: none; user-select: none; -webkit-user-drag: none;
     }
 
     .monster-wrap.hit .monster-img {
@@ -150,12 +161,25 @@
       100% { transform: translateY(0) scale(1); }
     }
 
+    /* Снежная дорога (SVG) */
+    .snow-ground {
+      position: absolute;
+      bottom: 0;
+      left: -50%;
+      width: 200%;
+      height: 120px;
+      z-index: 1;
+      pointer-events: none;
+      transition: transform 0.55s cubic-bezier(.6,.05,.3,1);
+    }
+
     /* HP-бар */
     .hp-bar-container {
       width: 260px;
       height: 34px;
       position: relative;
-      margin-top: -20px;
+      z-index: 5;
+      margin-top: -10px;
       transition: opacity 0.3s ease;
     }
 
@@ -438,28 +462,9 @@
     .confirm__btn--ghost:hover { border-color: var(--gold-2); color: var(--gold-2); }
     .confirm__btn--danger { background: #B91C1C; border: 1px solid #B91C1C; color: #FFFFFF; }
     .confirm__btn--danger:hover { background: #DC2626; border-color: #DC2626; }
-
-    /* Скрытый контейнер для предзагрузки картинок */
-    .preload-images {
-      position: absolute; width: 0; height: 0; opacity: 0; pointer-events: none;
-    }
   </style>
 </head>
 <body>
-
-  <!-- Скрытая предзагрузка картинок (русские названия) -->
-  <div class="preload-images">
-    <img src="монстр1.png" alt="">
-    <img src="монстр2.png" alt="">
-    <img src="монстр3.png" alt="">
-    <img src="персонаж.png" alt="">
-    <img src="шлем.png" alt="">
-    <img src="оружие.png" alt="">
-    <img src="акссесуар.png" alt="">
-    <img src="плащ.png" alt="">
-    <img src="броня.png" alt="">
-    <img src="питомец.png" alt="">
-  </div>
 
   <!-- ШАПКА -->
   <header class="header">
@@ -517,10 +522,47 @@
 
   <!-- ЭКРАН: ЗАРАБОТОК -->
   <main class="page page--earn active" id="page-earn">
-    <div class="monster-wrap" id="monsterWrap">
-      <img src="монстр1.png" id="monsterImg" class="monster-img" alt="Монстр" draggable="false">
+    
+    <div class="scene-wrap">
+      <!-- Снежная дорога -->
+      <svg class="snow-ground" id="snowGround" viewBox="0 0 800 120" preserveAspectRatio="none" xmlns="http://www.w3.org/2000/svg">
+        <defs>
+          <linearGradient id="driftGrad" x1="0" y1="0" x2="0" y2="1">
+            <stop offset="0%"   stop-color="#FFFFFF"/>
+            <stop offset="40%"  stop-color="#E4F1FA"/>
+            <stop offset="100%" stop-color="#9FC4DF"/>
+          </linearGradient>
+        </defs>
+        <!-- Нижняя глубина -->
+        <rect x="0" y="60" width="800" height="60" fill="#9FC4DF" opacity="0.55"/>
+        <!-- Сугробы -->
+        <path d="
+          M 0 60 Q 50 40 100 55 Q 150 70 200 55 Q 250 40 300 55 Q 350 70 400 55
+          Q 450 40 500 55 Q 550 70 600 55 Q 650 40 700 55 Q 750 70 800 55
+          L 800 120 L 0 120 Z
+        " fill="url(#driftGrad)"/>
+        <!-- Блик -->
+        <path d="
+          M 0 60 Q 50 40 100 55 Q 150 70 200 55 Q 250 40 300 55 Q 350 70 400 55
+          Q 450 40 500 55 Q 550 70 600 55 Q 650 40 700 55 Q 750 70 800 55
+        " stroke="#FFFFFF" stroke-opacity="0.85" stroke-width="3" fill="none"/>
+        <!-- Снежинки на земле -->
+        <g fill="#FFFFFF" opacity="0.7">
+          <circle cx="50" cy="80" r="2.5"/><circle cx="120" cy="90" r="1.8"/>
+          <circle cx="200" cy="85" r="2.2"/><circle cx="280" cy="95" r="1.5"/>
+          <circle cx="350" cy="78" r="2.8"/><circle cx="430" cy="88" r="2.0"/>
+          <circle cx="510" cy="92" r="1.7"/><circle cx="600" cy="82" r="2.4"/>
+          <circle cx="680" cy="95" r="1.9"/><circle cx="750" cy="80" r="2.6"/>
+        </g>
+      </svg>
+
+      <!-- Монстр -->
+      <div class="monster-wrap" id="monsterWrap">
+        <img src="монстр1.png" id="monsterImg" class="monster-img" alt="Монстр" draggable="false">
+      </div>
     </div>
     
+    <!-- HP-бар -->
     <div class="hp-bar-container" id="hpBarContainer">
       <div class="hp-bar-bg">
         <div class="hp-bar-fill" id="hpFill"></div>
@@ -671,6 +713,26 @@
   </div>
 
   <script>
+    // === ПРЕЛОАД КАРТИНОК ===
+    // Этот блок принудительно загружает все картинки в кэш браузера еще до старта игры
+    const imagesToPreload = [
+      'монстр1.png', 'монстр2.png', 'монстр3.png', 'персонаж.png',
+      'шлем.png', 'оружие.png', 'акссесуар.png', 'плащ.png', 'броня.png', 'питомец.png'
+    ];
+    let loadedImagesCount = 0;
+    imagesToPreload.forEach(src => {
+      const img = new Image();
+      img.onload = () => {
+        loadedImagesCount++;
+      };
+      img.onerror = () => {
+        console.warn('Не удалось загрузить: ' + src);
+        loadedImagesCount++;
+      };
+      img.src = src;
+    });
+
+    // === ЛОГИКА ИГРЫ ===
     const STORAGE_KEY = 'lohmaty_club_state_v2';
 
     const ITEMS = {
@@ -775,11 +837,13 @@
     // ======================== ЭКРАН ЗАРАБОТКА ========================
     const wrap  = document.getElementById('monsterWrap');
     const monsterImg = document.getElementById('monsterImg');
+    const snowGround = document.getElementById('snowGround');
     const layer = document.getElementById('cubesLayer');
     const hpFill     = document.getElementById('hpFill');
     const hpText     = document.getElementById('hpText');
     const hpBarContainer = document.getElementById('hpBarContainer');
 
+    // Фолбэки
     const FALLBACK_MONSTER = 'data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" fill="%232A2A2A"><circle cx="50" cy="50" r="40" stroke="%23C9A227" stroke-width="4"/><text x="50" y="55" font-size="20" fill="%23C9A227" text-anchor="middle" font-family="sans-serif" font-weight="bold">?</text></svg>';
     const FALLBACK_ITEM = 'data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" fill="%231A1A1A"><rect x="10" y="10" width="80" height="80" rx="10" stroke="%23C9A227" stroke-width="4"/></svg>';
     const FALLBACK_CHAR = 'data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" fill="%23141414"><rect width="100" height="100"/></svg>';
@@ -792,8 +856,6 @@
           this.src = FALLBACK_ITEM;
         } else if (this.classList.contains('character-center__img')) {
           this.src = FALLBACK_CHAR;
-        } else {
-          this.style.display = 'none';
         }
       };
     });
@@ -885,6 +947,13 @@
       state.monsterIndex = (state.monsterIndex || 0) + 1;
       saveState();
 
+      // Анимация сдвига земли влево
+      snowGround.style.transition = 'none';
+      snowGround.style.transform = 'translateX(0)';
+      void snowGround.offsetWidth;
+      snowGround.style.transition = 'transform 0.55s cubic-bezier(.6,.05,.3,1)';
+      snowGround.style.transform = 'translateX(-50%)'; // Сдвигаем дорогу
+
       setTimeout(() => {
         hp = getMaxHp();
         updateHpBar();
@@ -893,6 +962,10 @@
         monsterImg.style.transition = 'none';
         monsterImg.style.opacity = '0';
         monsterImg.style.transform = 'scale(0.8) translateX(100px)';
+
+        // Возвращаем землю обратно
+        snowGround.style.transition = 'none';
+        snowGround.style.transform = 'translateX(0)';
 
         requestAnimationFrame(() => {
           monsterImg.style.transition = 'opacity 0.4s, transform 0.4s';
