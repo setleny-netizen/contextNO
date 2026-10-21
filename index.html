@@ -135,6 +135,11 @@
       pointer-events: none;
       transition: transform 0.1s;
       filter: drop-shadow(0 10px 20px rgba(0,0,0,0.5));
+      /* Защита от перетаскивания */
+      user-drag: none; 
+      user-select: none;
+      -moz-user-select: none;
+      -webkit-user-drag: none;
     }
 
     .monster-wrap.hit .monster-img {
@@ -253,7 +258,7 @@
     .hintbar { text-align: center; pointer-events: none; margin-top: -10px; }
     .hint-text { font-size: 13px; color: var(--muted); letter-spacing: 0.02em; }
 
-    /* ================= ЭКРАН: УЛУЧШЕНИЯ (НОВЫЙ) ================= */
+    /* ================= ЭКРАН: УЛУЧШЕНИЯ ================= */
     .upgrades-container {
       display: flex;
       justify-content: space-between;
@@ -318,6 +323,7 @@
       max-width: 180px;
       object-fit: contain;
       filter: drop-shadow(0 10px 20px rgba(0,0,0,0.6));
+      user-drag: none; user-select: none; -webkit-user-drag: none;
     }
 
     /* Нижняя панель улучшения */
@@ -432,9 +438,29 @@
     .confirm__btn--ghost:hover { border-color: var(--gold-2); color: var(--gold-2); }
     .confirm__btn--danger { background: #B91C1C; border: 1px solid #B91C1C; color: #FFFFFF; }
     .confirm__btn--danger:hover { background: #DC2626; border-color: #DC2626; }
+
+    /* Скрытый контейнер для предзагрузки картинок */
+    .preload-images {
+      position: absolute; width: 0; height: 0; opacity: 0; pointer-events: none;
+    }
   </style>
 </head>
 <body>
+
+  <!-- Скрытая предзагрузка картинок -->
+  <div class="preload-images">
+    <!-- ВСТАВЬТЕ СЮДА ВСЕ ВАШИ ПУТИ К КАРТИНКАМ -->
+    <img src="monster1.png" alt="">
+    <img src="monster2.png" alt="">
+    <img src="monster3.png" alt="">
+    <img src="character.png" alt="">
+    <img src="helmet.png" alt="">
+    <img src="weapon.png" alt="">
+    <img src="accessory.png" alt="">
+    <img src="cape.png" alt="">
+    <img src="armor.png" alt="">
+    <img src="pet.png" alt="">
+  </div>
 
   <!-- ШАПКА -->
   <header class="header">
@@ -493,8 +519,8 @@
   <!-- ЭКРАН: ЗАРАБОТОК -->
   <main class="page page--earn active" id="page-earn">
     <div class="monster-wrap" id="monsterWrap">
-      <!-- Сюда подставляется рандомный монстр -->
-      <img src="https://via.placeholder.com/300x300/141414/333333?text=Monster+1" id="monsterImg" class="monster-img" alt="Монстр">
+      <!-- onerror подставит заглушку, если файл не найден -->
+      <img src="monster1.png" id="monsterImg" class="monster-img" alt="Монстр" draggable="false">
     </div>
     
     <div class="hp-bar-container" id="hpBarContainer">
@@ -510,44 +536,43 @@
     </div>
   </main>
 
-  <!-- ЭКРАН: УЛУЧШЕНИЯ (НОВЫЙ) -->
+  <!-- ЭКРАН: УЛУЧШЕНИЯ -->
   <main class="page" id="page-upgrades" style="position: relative;">
     
     <div class="upgrades-container">
       <!-- ЛЕВАЯ КОЛОНКА -->
       <div class="upgrades-col">
         <div class="item-slot" id="item-helmet" data-id="helmet">
-          <img src="https://via.placeholder.com/50/2A2A2A/C9A227?text=H" class="item-slot__img" alt="Шлем">
+          <img src="helmet.png" class="item-slot__img" alt="Шлем" draggable="false">
           <span class="item-slot__lvl">Ур. 1</span>
         </div>
         <div class="item-slot" id="item-weapon" data-id="weapon">
-          <img src="https://via.placeholder.com/50/2A2A2A/C9A227?text=W" class="item-slot__img" alt="Оружие">
+          <img src="weapon.png" class="item-slot__img" alt="Оружие" draggable="false">
           <span class="item-slot__lvl">Ур. 1</span>
         </div>
         <div class="item-slot" id="item-accessory" data-id="accessory">
-          <img src="https://via.placeholder.com/50/2A2A2A/C9A227?text=A" class="item-slot__img" alt="Аксессуар">
+          <img src="accessory.png" class="item-slot__img" alt="Аксессуар" draggable="false">
           <span class="item-slot__lvl">Ур. 1</span>
         </div>
       </div>
 
       <!-- ЦЕНТР -->
       <div class="character-center">
-        <!-- Замените на персонаж.png -->
-        <img src="https://via.placeholder.com/200x400/141414/888888?text=Character" class="character-center__img" alt="Персонаж">
+        <img src="character.png" class="character-center__img" alt="Персонаж" draggable="false">
       </div>
 
       <!-- ПРАВАЯ КОЛОНКА -->
       <div class="upgrades-col">
         <div class="item-slot" id="item-cape" data-id="cape">
-          <img src="https://via.placeholder.com/50/2A2A2A/C9A227?text=C" class="item-slot__img" alt="Плащ">
+          <img src="cape.png" class="item-slot__img" alt="Плащ" draggable="false">
           <span class="item-slot__lvl">Ур. 1</span>
         </div>
         <div class="item-slot" id="item-armor" data-id="armor">
-          <img src="https://via.placeholder.com/50/2A2A2A/C9A227?text=Ar" class="item-slot__img" alt="Броня">
+          <img src="armor.png" class="item-slot__img" alt="Броня" draggable="false">
           <span class="item-slot__lvl">Ур. 1</span>
         </div>
         <div class="item-slot" id="item-pet" data-id="pet">
-          <img src="https://via.placeholder.com/50/2A2A2A/C9A227?text=P" class="item-slot__img" alt="Питомец">
+          <img src="pet.png" class="item-slot__img" alt="Питомец" draggable="false">
           <span class="item-slot__lvl">Ур. 1</span>
         </div>
       </div>
@@ -677,7 +702,6 @@
         if (!raw) return defaultState();
         const parsed = JSON.parse(raw);
         const merged = { ...defaultState(), ...parsed };
-        // Страховка на случай старых сохранений
         if (!merged.itemLevels) merged.itemLevels = defaultState().itemLevels;
         if (!merged.lastPlayed) merged.lastPlayed = Date.now();
         if (typeof merged.currentHp !== 'number') merged.currentHp = 100;
@@ -721,7 +745,6 @@
       return Math.floor(num).toString();
     }
 
-    // Сумма уровней всех предметов
     function getTotalItemLevels() {
       return Object.values(state.itemLevels).reduce((a, b) => a + b, 0);
     }
@@ -736,7 +759,6 @@
 
     function getUpgradePrice(itemId) {
       const lvl = state.itemLevels[itemId] || 1;
-      // Базовая цена 50 * 1.5^(lvl-1)
       return Math.floor(ITEMS[itemId].basePrice * Math.pow(1.5, lvl - 1));
     }
 
@@ -761,6 +783,26 @@
     const hpText     = document.getElementById('hpText');
     const hpBarContainer = document.getElementById('hpBarContainer');
 
+    // НАДЕЖНАЯ ЗАГРУЗКА КАРТИНОК (если файла нет - ставим заглушку)
+    const FALLBACK_MONSTER = 'data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" fill="%232A2A2A"><circle cx="50" cy="50" r="40" stroke="%23C9A227" stroke-width="4"/><text x="50" y="55" font-size="20" fill="%23C9A227" text-anchor="middle" font-family="sans-serif" font-weight="bold">?</text></svg>';
+    const FALLBACK_ITEM = 'data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" fill="%231A1A1A"><rect x="10" y="10" width="80" height="80" rx="10" stroke="%23C9A227" stroke-width="4"/></svg>';
+    const FALLBACK_CHAR = 'data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" fill="%23141414"><rect width="100" height="100"/></svg>';
+
+    // Вешаем onerror на все картинки, чтобы они не ломались
+    document.querySelectorAll('img').forEach(img => {
+      img.onerror = function() {
+        if (this.classList.contains('monster-img')) {
+          this.src = FALLBACK_MONSTER;
+        } else if (this.classList.contains('item-slot__img')) {
+          this.src = FALLBACK_ITEM;
+        } else if (this.classList.contains('character-center__img')) {
+          this.src = FALLBACK_CHAR;
+        } else {
+          this.style.display = 'none'; // Скрываем битые картинки в предзагрузке
+        }
+      };
+    });
+
     let hp = 0;
     function getMaxHp() {
       return 100 + 20 * (state.monsterIndex || 0);
@@ -773,18 +815,14 @@
       hpText.textContent = Math.max(0, Math.ceil(hp));
     }
 
-    // Меняем картинку монстра
     function updateMonsterImage() {
       const type = (state.monsterIndex || 0) % 3;
-      // ВСТАВЬТЕ СЮДА ПУТИ К ВАШИМ КАРТИНКАМ
       const monsters = [
-        'monster1.png', // Ссылка на монстр1.png
-        'monster2.png', // Ссылка на монстр2.png
-        'monster3.png'  // Ссылка на монстр3.png
+        'monster1.png', 
+        'monster2.png', 
+        'monster3.png' 
       ];
-      
-      // Если картинки нет, используем заглушку для демонстрации
-      monsterImg.src = monsters[type] || `https://via.placeholder.com/300x300/141414/333333?text=Monster+${type+1}`;
+      monsterImg.src = monsters[type];
     }
 
     hp = state.currentHp;
@@ -957,12 +995,10 @@
       }
     }
 
-    // Пассивный урон
     setInterval(() => {
       const incomePerSec = getPassiveBonus();
       if (incomePerSec > 0 && !dead) {
         const amount = incomePerSec / 20;
-
         applyDamage(amount);
         
         state.balance += amount;
@@ -1034,7 +1070,6 @@
     
     let activeItemId = null;
 
-    // Обновление всех слотов на экране
     function renderUpgradeScreen() {
       Object.keys(ITEMS).forEach(id => {
         const lvl = state.itemLevels[id] || 1;
@@ -1047,7 +1082,6 @@
     function openItemPanel(id) {
       activeItemId = id;
       
-      // Подсветка
       document.querySelectorAll('.item-slot').forEach(el => el.classList.remove('active'));
       document.querySelector(`.item-slot[data-id="${id}"]`).classList.add('active');
 
@@ -1067,7 +1101,6 @@
       upgradePanel.classList.add('open');
     }
 
-    // Клик по слоту
     document.querySelectorAll('.item-slot').forEach(el => {
       el.addEventListener('click', () => {
         const id = el.dataset.id;
@@ -1075,7 +1108,6 @@
       });
     });
 
-    // Клик по кнопке покупки
     buyBtn.addEventListener('click', () => {
       if (!activeItemId) return;
       const price = getUpgradePrice(activeItemId);
@@ -1089,7 +1121,6 @@
       renderUpgradeScreen();
     });
 
-    // Закрываем панель при клике вне её
     document.getElementById('page-upgrades').addEventListener('click', (e) => {
       if (!e.target.closest('.item-slot') && !e.target.closest('.upgrade-bottom-panel')) {
         upgradePanel.classList.remove('open');
@@ -1164,8 +1195,6 @@
 
     updateHeaderUI();
     updateProfileUI();
-    
-    // Инициализация
     renderUpgradeScreen();
 
     setInterval(saveState, 5000);
